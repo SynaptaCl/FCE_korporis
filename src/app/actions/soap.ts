@@ -143,7 +143,6 @@ export async function upsertSoapNote(
       return { success: false, error: (e as Error).message };
     }
 
-    const idClinica = await getIdClinica(supabase, user.id);
     const { data: created, error } = await supabase
       .from("fce_notas_soap")
       .insert({
@@ -152,7 +151,6 @@ export async function upsertSoapNote(
         ...parsed.data,
         firmado: false,
         created_by: user.id,
-        ...(idClinica ? { id_clinica: idClinica } : {}),
       })
       .select("id")
       .single();

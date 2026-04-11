@@ -137,7 +137,6 @@ export async function saveVitalSigns(
 
   const { supabase, user } = await requireAuth();
 
-  const idClinica = await getIdClinica(supabase, user.id);
   const { data, error } = await supabase
     .from("fce_signos_vitales")
     .insert({
@@ -146,7 +145,6 @@ export async function saveVitalSigns(
       ...parsed.data,
       recorded_by: user.id,
       recorded_at: new Date().toISOString(),
-      ...(idClinica ? { id_clinica: idClinica } : {}),
     })
     .select("id")
     .single();
