@@ -398,7 +398,7 @@ export function ConsentManager({ patientId, consentimientos }: ConsentManagerPro
 
           {firmaDataUrl ? (
             <div className="space-y-3">
-              <p className="text-xs text-green-700 font-medium flex items-center gap-1.5">
+              <p className="text-xs text-kp-primary font-medium flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
                 Firma capturada
               </p>
