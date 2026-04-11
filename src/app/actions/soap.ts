@@ -180,7 +180,7 @@ export async function signSoapNote(
 
   const firmadoPor = prof
     ? `${prof.nombre} ${prof.apellidos}`.trim()
-    : user.email ?? user.id;
+    : user.id;
 
   const { error } = await supabase
     .from("fce_notas_soap")
