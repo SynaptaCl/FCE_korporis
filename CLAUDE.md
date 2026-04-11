@@ -126,7 +126,8 @@ subjetivo, objetivo, analisis_cif, plan,
 intervenciones, tareas_domiciliarias, proxima_sesion,
 firmado, firmado_at, firmado_por, created_at
 ```
-NO tiene: `created_by`, `id_clinica`. El autor queda registrado en `firmado_por` al firmar.
+NO tiene: `created_by`, `updated_at`, `id_clinica`.
+El autor queda registrado en `firmado_por` al firmar. No hay updated_at — las notas son inmutables una vez firmadas.
 
 ### Schema `fce_evaluaciones` (columnas exactas)
 ```
