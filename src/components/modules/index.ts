@@ -1,2 +1,8 @@
 export { PatientForm } from "./PatientForm";
 export { PatientList } from "./PatientList";
+export { AnamnesisForm } from "./AnamnesisForm";
+export { RedFlagsChecklist } from "./RedFlagsChecklist";
+export { VitalSignsPanel } from "./VitalSignsPanel";
+export { KinesiologiaEval } from "./KinesiologiaEval";
+export { FonoaudiologiaEval } from "./FonoaudiologiaEval";
+export { MasoterapiaEval } from "./MasoterapiaEval";

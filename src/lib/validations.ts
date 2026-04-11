@@ -74,6 +74,61 @@ export const soapSchema = z.object({
   proxima_sesion: z.string().optional(),
 });
 
+// ── Anamnesis ──
+
+export const anamnesisSchema = z.object({
+  motivo_consulta: z.string().min(5, "Describe el motivo de consulta (mínimo 5 caracteres)"),
+  antecedentes_medicos: z.array(
+    z.object({
+      patologia: z.string().min(1, "Patología es obligatoria"),
+      desde: z.string().optional(),
+      controlado: z.boolean(),
+    })
+  ),
+  antecedentes_quirurgicos: z.array(
+    z.object({
+      tipo: z.string().min(1, "Tipo de cirugía es obligatorio"),
+      fecha: z.string().min(1, "Fecha es obligatoria"),
+      hospital: z.string().optional(),
+    })
+  ),
+  farmacologia: z.array(
+    z.object({
+      medicamento: z.string().min(1, "Medicamento es obligatorio"),
+      dosis: z.string().min(1, "Dosis es obligatoria"),
+      frecuencia: z.string().min(1, "Frecuencia es obligatoria"),
+    })
+  ),
+  alergias: z.array(
+    z.object({
+      sustancia: z.string().min(1, "Sustancia es obligatoria"),
+      severidad: z.enum(["leve", "moderada", "severa"]),
+      reaccion: z.string().min(1, "Describe la reacción"),
+    })
+  ),
+  red_flags: z.object({
+    marcapasos: z.boolean(),
+    embarazo: z.boolean(),
+    tvp: z.boolean(),
+    oncologico: z.boolean(),
+    fiebre: z.boolean(),
+    alergias_severas: z.boolean(),
+    infeccion_cutanea: z.boolean(),
+    fragilidad_capilar: z.boolean(),
+  }),
+  habitos: z.object({
+    tabaco: z.enum(["no", "ocasional", "diario"]),
+    alcohol: z.enum(["no", "ocasional", "frecuente"]),
+    ejercicio: z.enum(["sedentario", "leve", "moderado", "intenso"]),
+    sueno_horas: z.number().min(1, "Min. 1 hora").max(24, "Max. 24 horas"),
+  }),
+});
+
+export type AnamnesisSchemaType = z.infer<typeof anamnesisSchema>;
+
+// ── Vital Signs (panel independiente) ──
+export type VitalSignsSchemaType = z.infer<typeof vitalSignsSchema>;
+
 // ── Masoterapia Contraindicaciones (hard-stop) ──
 
 export const masoContraindicacionesSchema = z.object({

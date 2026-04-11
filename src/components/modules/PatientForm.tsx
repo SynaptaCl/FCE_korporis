@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle, XCircle, User, MapPin, Shield, Phone } from "lucide-react";
-import { patientSchema, type PatientSchemaType } from "@/lib/validations";
+import { patientSchema } from "@/lib/validations";
+import type { z } from "zod";
 import { cleanRun, formatRun, validateRun } from "@/lib/run-validator";
 import { calculateAge, cn } from "@/lib/utils";
 import { REGIONES_CHILE } from "@/lib/constants";
@@ -54,7 +55,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const defaultValues: Partial<PatientSchemaType> = initialData
+  const defaultValues: Partial<z.input<typeof patientSchema>> = initialData
     ? {
         run: cleanRun(initialData.run),
         nombres: initialData.nombres,
@@ -83,7 +84,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
     handleSubmit,
     watch,
     formState: { errors, isSubmitting },
-  } = useForm<PatientSchemaType>({
+  } = useForm<z.input<typeof patientSchema>, unknown, z.output<typeof patientSchema>>({
     resolver: zodResolver(patientSchema),
     defaultValues,
   });
@@ -95,7 +96,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
       ? calculateAge(fechaNacimiento)
       : null;
 
-  async function onSubmit(data: PatientSchemaType) {
+  async function onSubmit(data: z.output<typeof patientSchema>) {
     setServerError(null);
 
     if (mode === "create") {
