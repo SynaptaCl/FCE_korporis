@@ -138,3 +138,13 @@ export const masoContraindicacionesSchema = z.object({
   fragilidad_capilar: z.literal(false, { message: "Contraindicación activa: fragilidad capilar" }),
   fiebre_aguda: z.literal(false, { message: "Contraindicación activa: fiebre" }),
 });
+
+// ── Consentimiento ──
+
+export const consentSchema = z.object({
+  tipo: z.enum(["general", "menores", "teleconsulta"]),
+  contenido: z.string().min(10, "Contenido es obligatorio"),
+  firma_paciente_data_url: z.string().min(1, "La firma del paciente es obligatoria"),
+});
+
+export type ConsentSchemaType = z.infer<typeof consentSchema>;
