@@ -128,7 +128,7 @@ export async function upsertSoapNote(
 
     const { error } = await supabase
       .from("fce_notas_soap")
-      .update({ ...parsed.data, updated_at: new Date().toISOString() })
+      .update({ ...parsed.data })
       .eq("id", noteId);
 
     if (error) return { success: false, error: error.message };
