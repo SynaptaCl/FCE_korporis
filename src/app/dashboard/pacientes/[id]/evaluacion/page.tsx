@@ -55,7 +55,12 @@ export default async function EvaluacionPage({
     .eq("id", user.id)
     .single();
 
-  const profEspecialidad = (profesional?.especialidad as Especialidad) ?? "kinesiologia";
+  const rawEspecialidad = profesional?.especialidad ?? "kinesiologia";
+  const isAdminUser = rawEspecialidad === "Administración Clínica";
+  // Admin usa "kinesiologia" como tab por defecto; su acceso no está restringido por especialidad
+  const profEspecialidad = isAdminUser
+    ? "kinesiologia"
+    : (rawEspecialidad as Especialidad);
 
   // Determinar tab activa (default: especialidad del profesional)
   const validEsp = ESPECIALIDAD_TABS.map((t) => t.key);
@@ -106,7 +111,7 @@ export default async function EvaluacionPage({
         </div>
         <div className="ml-auto">
           <Badge variant="teal">
-            {ESPECIALIDAD_LABELS[profEspecialidad]} — edición activa
+            {isAdminUser ? "Acceso completo — Admin" : `${ESPECIALIDAD_LABELS[profEspecialidad]} — edición activa`}
           </Badge>
         </div>
       </div>
@@ -145,21 +150,21 @@ export default async function EvaluacionPage({
           <KinesiologiaEval
             patientId={id}
             evaluaciones={evalsByEsp("kinesiologia")}
-            readOnly={profEspecialidad !== "kinesiologia"}
+            readOnly={!isAdminUser && profEspecialidad !== "kinesiologia"}
           />
         )}
         {activeEsp === "fonoaudiologia" && (
           <FonoaudiologiaEval
             patientId={id}
             evaluaciones={evalsByEsp("fonoaudiologia")}
-            readOnly={profEspecialidad !== "fonoaudiologia"}
+            readOnly={!isAdminUser && profEspecialidad !== "fonoaudiologia"}
           />
         )}
         {activeEsp === "masoterapia" && (
           <MasoterapiaEval
             patientId={id}
             evaluaciones={evalsByEsp("masoterapia")}
-            readOnly={profEspecialidad !== "masoterapia"}
+            readOnly={!isAdminUser && profEspecialidad !== "masoterapia"}
           />
         )}
       </Card>
