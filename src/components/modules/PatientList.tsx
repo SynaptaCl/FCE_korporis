@@ -12,13 +12,14 @@ interface PatientListProps {
   patients: Patient[];
 }
 
-function previsionLabel(p: Patient["prevision"]): string {
+function previsionLabel(p: Patient["prevision"] | null | undefined): string {
+  if (!p) return "Sin previsión";
   if (p.tipo === "FONASA") return `FONASA ${p.tramo ?? ""}`.trim();
   if (p.tipo === "Isapre") return p.isapre ?? "Isapre";
   return "Particular";
 }
 
-function previsionVariant(tipo: Patient["prevision"]["tipo"]) {
+function previsionVariant(tipo: Patient["prevision"]["tipo"] | null | undefined) {
   if (tipo === "FONASA") return "info" as const;
   if (tipo === "Isapre") return "teal" as const;
   return "default" as const;
@@ -114,7 +115,7 @@ export function PatientList({ patients }: PatientListProps) {
                 <span className="text-sm text-ink-2">{age !== null ? `${age} años` : "Sin registro"}</span>
 
                 {/* Previsión */}
-                <Badge variant={previsionVariant(patient.prevision.tipo)}>
+                <Badge variant={previsionVariant(patient.prevision?.tipo)}>
                   {previsionLabel(patient.prevision)}
                 </Badge>
 
