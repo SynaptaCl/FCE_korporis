@@ -95,12 +95,12 @@ export default async function PatientDetailPage({
   const p = result.data;
   const age = calculateAge(p.fecha_nacimiento);
   const fullName = `${p.nombres} ${p.apellido_paterno} ${p.apellido_materno}`;
-  const initials = `${p.nombres[0]}${p.apellido_paterno[0]}`.toUpperCase();
+  const initials = `${p.nombres?.[0] ?? ""}${p.apellido_paterno?.[0] ?? ""}`.toUpperCase() || "?";
 
   const previsionLabel =
-    p.prevision.tipo === "FONASA"
+    p.prevision?.tipo === "FONASA"
       ? `FONASA ${p.prevision.tramo ?? ""}`.trim()
-      : p.prevision.tipo === "Isapre"
+      : p.prevision?.tipo === "Isapre"
         ? p.prevision.isapre ?? "Isapre"
         : "Particular";
 
