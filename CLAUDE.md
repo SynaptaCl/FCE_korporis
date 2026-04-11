@@ -119,6 +119,22 @@ CON id_clinica:    fce_anamnesis, fce_encuentros, fce_consentimientos
 SIN id_clinica:    fce_evaluaciones, fce_signos_vitales, fce_notas_soap
 ```
 
+### Schema `fce_notas_soap` (columnas exactas)
+```
+id, id_encuentro, id_paciente,
+subjetivo, objetivo, analisis_cif, plan,
+intervenciones, tareas_domiciliarias, proxima_sesion,
+firmado, firmado_at, firmado_por, created_at
+```
+NO tiene: `created_by`, `id_clinica`. El autor queda registrado en `firmado_por` al firmar.
+
+### Schema `fce_evaluaciones` (columnas exactas)
+```
+id, id_encuentro, id_paciente, especialidad, sub_area,
+data, contraindicaciones_certificadas, created_by, created_at
+```
+NO tiene: `id_clinica`.
+
 ### RLS — solo las tablas CON `id_clinica` la requieren en INSERT
 Obtener con `getIdClinica(supabase, user.id)` desde `patients.ts`.
 Si retorna null → hard-fail con mensaje al usuario, no insertar.
