@@ -5,7 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatRun(run: string): string {
+export function formatRun(run: string | null | undefined): string {
+  if (!run) return "—";
   const clean = run.replace(/[^0-9kK]/g, "");
   if (clean.length < 2) return clean;
   const body = clean.slice(0, -1);
