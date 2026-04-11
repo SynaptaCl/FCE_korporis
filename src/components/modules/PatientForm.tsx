@@ -57,20 +57,20 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
 
   const defaultValues: Partial<z.input<typeof patientSchema>> = initialData
     ? {
-        run: cleanRun(initialData.run),
-        nombre: initialData.nombre,
-        apellido_paterno: initialData.apellido_paterno,
-        apellido_materno: initialData.apellido_materno,
-        fecha_nacimiento: initialData.fecha_nacimiento,
-        sexo_registral: initialData.sexo_registral,
+        run: cleanRun(initialData.run ?? ""),
+        nombre: initialData.nombre ?? "",
+        apellido_paterno: initialData.apellido_paterno ?? "",
+        apellido_materno: initialData.apellido_materno ?? "",
+        fecha_nacimiento: initialData.fecha_nacimiento ?? "",
+        sexo_registral: initialData.sexo_registral ?? "M",
         identidad_genero: initialData.identidad_genero ?? "",
-        nacionalidad: initialData.nacionalidad,
-        telefono: initialData.telefono,
+        nacionalidad: initialData.nacionalidad ?? "Chilena",
+        telefono: initialData.telefono ?? "",
         email: initialData.email ?? "",
-        direccion: initialData.direccion,
-        ocupacion: initialData.ocupacion,
-        prevision: initialData.prevision,
-        contacto_emergencia: initialData.contacto_emergencia,
+        direccion: initialData.direccion ?? undefined,
+        ocupacion: initialData.ocupacion ?? "",
+        prevision: initialData.prevision ?? undefined,
+        contacto_emergencia: initialData.contacto_emergencia ?? undefined,
       }
     : {
         nacionalidad: "Chilena",

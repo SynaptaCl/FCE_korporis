@@ -19,20 +19,20 @@ export interface Prevision {
 
 export interface Patient {
   id: string;
-  run: string;
-  nombre: string;
-  apellido_paterno: string;
-  apellido_materno: string;
-  fecha_nacimiento: string;
-  sexo_registral: "M" | "F" | "Otro";
-  identidad_genero?: string;
-  nacionalidad: string;
-  telefono: string;
-  email?: string;
-  direccion: Address;
-  ocupacion: string;
-  prevision: Prevision;
-  contacto_emergencia: EmergencyContact;
+  run: string | null;
+  nombre: string | null;
+  apellido_paterno: string | null;
+  apellido_materno: string | null;
+  fecha_nacimiento: string | null;
+  sexo_registral: "M" | "F" | "Otro" | null;
+  identidad_genero?: string | null;
+  nacionalidad: string | null;
+  telefono: string | null;
+  email?: string | null;
+  direccion: Address | null;
+  ocupacion: string | null;
+  prevision: Prevision | null;
+  contacto_emergencia: EmergencyContact | null;
   created_at: string;
   updated_at: string;
 }

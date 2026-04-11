@@ -29,7 +29,7 @@ export default async function EditarPacientePage({
   if (!result.success) notFound();
 
   const patient = result.data;
-  const fullName = `${patient.nombre} ${patient.apellido_paterno} ${patient.apellido_materno}`;
+  const fullName = [patient.nombre, patient.apellido_paterno, patient.apellido_materno].filter(Boolean).join(" ") || "Sin nombre";
 
   return (
     <div className="max-w-2xl space-y-5">

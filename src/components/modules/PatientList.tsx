@@ -19,7 +19,7 @@ function previsionLabel(p: Patient["prevision"] | null | undefined): string {
   return "Particular";
 }
 
-function previsionVariant(tipo: Patient["prevision"]["tipo"] | null | undefined) {
+function previsionVariant(tipo: "FONASA" | "Isapre" | "Particular" | null | undefined) {
   if (tipo === "FONASA") return "info" as const;
   if (tipo === "Isapre") return "teal" as const;
   return "default" as const;
@@ -33,9 +33,9 @@ export function PatientList({ patients }: PatientListProps) {
     if (!query.trim()) return patients;
     const q = query.toLowerCase().replace(/[.\-\s]/g, "");
     return patients.filter((p) => {
-      const runClean = p.run.replace(/[.\-\s]/g, "").toLowerCase();
+      const runClean = (p.run ?? "").replace(/[.\-\s]/g, "").toLowerCase();
       const fullName =
-        `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`.toLowerCase();
+        [p.nombre, p.apellido_paterno, p.apellido_materno].filter(Boolean).join(" ").toLowerCase();
       return runClean.includes(q) || fullName.includes(q.toLowerCase());
     });
   }, [patients, query]);
@@ -86,7 +86,7 @@ export function PatientList({ patients }: PatientListProps) {
           {filtered.map((patient, idx) => {
             const age = calculateAge(patient.fecha_nacimiento);
             const run = formatRun(patient.run);
-            const fullName = `${patient.apellido_paterno} ${patient.apellido_materno}, ${patient.nombre}`;
+            const fullName = [patient.apellido_paterno, patient.apellido_materno].filter(Boolean).join(" ") + (patient.nombre ? `, ${patient.nombre}` : "");
 
             return (
               <button

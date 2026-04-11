@@ -22,11 +22,11 @@ export function PatientHeader({
 }: PatientHeaderProps) {
   const initials = `${patient.nombre?.charAt(0) ?? ""}${patient.apellido_paterno?.charAt(0) ?? ""}`;
   const age = calculateAge(patient.fecha_nacimiento);
-  const fullName = `${patient.nombre} ${patient.apellido_paterno} ${patient.apellido_materno}`;
+  const fullName = [patient.nombre, patient.apellido_paterno, patient.apellido_materno].filter(Boolean).join(" ") || "Sin nombre";
   const previsionLabel =
-    patient.prevision.tipo === "FONASA"
-      ? `FONASA ${patient.prevision.tramo || ""}`
-      : patient.prevision.tipo === "Isapre"
+    patient.prevision?.tipo === "FONASA"
+      ? `FONASA ${patient.prevision.tramo || ""}`.trim()
+      : patient.prevision?.tipo === "Isapre"
         ? patient.prevision.isapre || "Isapre"
         : "Particular";
 

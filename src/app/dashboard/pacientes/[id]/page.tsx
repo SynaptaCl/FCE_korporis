@@ -94,7 +94,7 @@ export default async function PatientDetailPage({
 
   const p = result.data;
   const age = calculateAge(p.fecha_nacimiento);
-  const fullName = `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`;
+  const fullName = [p.nombre, p.apellido_paterno, p.apellido_materno].filter(Boolean).join(" ") || "Sin nombre";
   const initials = `${p.nombre?.[0] ?? ""}${p.apellido_paterno?.[0] ?? ""}`.toUpperCase() || "?";
 
   const previsionLabel =
@@ -142,7 +142,9 @@ export default async function PatientDetailPage({
                   ? "Masculino"
                   : p.sexo_registral === "F"
                     ? "Femenino"
-                    : "Otro"}
+                    : p.sexo_registral === "Otro"
+                      ? "Otro"
+                      : "Sin registro"}
               </span>
               <span>
                 <span className="font-medium text-ink-1">Previsión:</span>{" "}
@@ -210,9 +212,9 @@ export default async function PatientDetailPage({
                   : "Sin registro"
               }
             />
-            <DataField label="Nacionalidad" value={p.nacionalidad} />
-            <DataField label="Ocupación" value={p.ocupacion} />
-            <DataField label="Teléfono" value={p.telefono} />
+            <DataField label="Nacionalidad" value={p.nacionalidad ?? "Sin registro"} />
+            <DataField label="Ocupación" value={p.ocupacion ?? "Sin registro"} />
+            <DataField label="Teléfono" value={p.telefono ?? "Sin registro"} />
             <DataField label="Email" value={p.email ?? "—"} />
             {p.identidad_genero && (
               <DataField
@@ -226,11 +228,15 @@ export default async function PatientDetailPage({
         {/* Dirección */}
         <Card title="Dirección" icon={<MapPin className="w-4 h-4" />}>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
-            <DataField label="Región" value={p.direccion.region} />
-            <DataField label="Comuna" value={p.direccion.comuna} />
+            <DataField label="Región" value={p.direccion?.region ?? "Sin registro"} />
+            <DataField label="Comuna" value={p.direccion?.comuna ?? "Sin registro"} />
             <DataField
               label="Dirección"
-              value={`${p.direccion.calle} ${p.direccion.numero}`}
+              value={
+                p.direccion?.calle
+                  ? `${p.direccion.calle} ${p.direccion.numero ?? ""}`.trim()
+                  : "Sin registro"
+              }
               wide
             />
           </dl>
@@ -239,20 +245,20 @@ export default async function PatientDetailPage({
         {/* Previsión */}
         <Card title="Previsión" icon={<Shield className="w-4 h-4" />}>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
-            <DataField label="Tipo" value={p.prevision.tipo} />
-            {p.prevision.tipo === "FONASA" && p.prevision.tramo && (
+            <DataField label="Tipo" value={p.prevision?.tipo ?? "Sin registro"} />
+            {p.prevision?.tipo === "FONASA" && p.prevision.tramo && (
               <DataField label="Tramo" value={p.prevision.tramo} />
             )}
-            {p.prevision.tipo === "Isapre" && p.prevision.isapre && (
+            {p.prevision?.tipo === "Isapre" && p.prevision.isapre && (
               <DataField label="Isapre" value={p.prevision.isapre} />
             )}
           </dl>
           <div className="mt-3">
             <Badge
               variant={
-                p.prevision.tipo === "FONASA"
+                p.prevision?.tipo === "FONASA"
                   ? "info"
-                  : p.prevision.tipo === "Isapre"
+                  : p.prevision?.tipo === "Isapre"
                     ? "teal"
                     : "default"
               }
@@ -270,16 +276,16 @@ export default async function PatientDetailPage({
           <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
             <DataField
               label="Nombre"
-              value={p.contacto_emergencia.nombre}
+              value={p.contacto_emergencia?.nombre ?? "Sin registro"}
               wide
             />
             <DataField
               label="Parentesco"
-              value={p.contacto_emergencia.parentesco}
+              value={p.contacto_emergencia?.parentesco ?? "Sin registro"}
             />
             <DataField
               label="Teléfono"
-              value={p.contacto_emergencia.telefono}
+              value={p.contacto_emergencia?.telefono ?? "Sin registro"}
             />
           </dl>
         </Card>
@@ -296,7 +302,7 @@ function DataField({
   wide = false,
 }: {
   label: string;
-  value: string;
+  value: string | null | undefined;
   wide?: boolean;
 }) {
   return (
@@ -304,7 +310,7 @@ function DataField({
       <dt className="text-[0.65rem] font-semibold text-ink-3 uppercase tracking-wide">
         {label}
       </dt>
-      <dd className="text-sm text-ink-1 mt-0.5">{value}</dd>
+      <dd className="text-sm text-ink-1 mt-0.5">{value ?? "—"}</dd>
     </div>
   );
 }
