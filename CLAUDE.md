@@ -113,18 +113,16 @@ tabla_afectada   (NO resource_type)
 registro_id      (NO resource_id)
 ```
 
-### Tablas FCE con prefijo `fce_`
+### Tablas FCE — columna `id_clinica`
 ```
-fce_anamnesis
-fce_signos_vitales
-fce_evaluaciones
-fce_encuentros
-fce_notas_soap
+CON id_clinica:    fce_anamnesis, fce_encuentros, fce_consentimientos
+SIN id_clinica:    fce_evaluaciones, fce_signos_vitales, fce_notas_soap
 ```
 
-### RLS — todo INSERT debe incluir `id_clinica`
-Obtener siempre con `getIdClinica(supabase, user.id)` desde `patients.ts`.
+### RLS — solo las tablas CON `id_clinica` la requieren en INSERT
+Obtener con `getIdClinica(supabase, user.id)` desde `patients.ts`.
 Si retorna null → hard-fail con mensaje al usuario, no insertar.
+NO agregar `id_clinica` a tablas que no la tienen — provoca error de columna inexistente.
 
 ### `admin_users` — lookup de id_clinica
 ```typescript
