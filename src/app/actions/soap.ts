@@ -150,7 +150,6 @@ export async function upsertSoapNote(
         id_encuentro: encounterId,
         ...parsed.data,
         firmado: false,
-        created_by: user.id,
       })
       .select("id")
       .single();
