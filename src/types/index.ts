@@ -26,7 +26,7 @@ export type {
 } from "./cif";
 export { CIF_QUANTIFIER_LABELS, CIF_DOMAIN_LABELS } from "./cif";
 export type { Consent, ConsentType, SignatureData, ProfessionalSignature } from "./consent";
-export type { AuditEntry, AuditAction, AuditResourceType } from "./audit";
+export type { AuditEntry, AuditAction, AuditActorTipo } from "./audit";
 export type {
   Anamnesis,
   VitalSigns,

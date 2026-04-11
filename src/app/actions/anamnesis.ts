@@ -18,13 +18,14 @@ async function requireAuth() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function logAudit(supabase: any, userId: string, action: string, resourceType: string, resourceId: string) {
+async function logAudit(supabase: any, userId: string, accion: string, tablaAfectada: string, registroId: string) {
   try {
     await supabase.from("logs_auditoria").insert({
-      user_id: userId,
-      action,
-      resource_type: resourceType,
-      resource_id: resourceId,
+      actor_id: userId,
+      actor_tipo: "profesional",
+      accion,
+      tabla_afectada: tablaAfectada,
+      registro_id: registroId,
     });
   } catch { /* no bloquea el flujo */ }
 }
@@ -39,7 +40,7 @@ export async function getAnamnesis(
   const { data, error } = await supabase
     .from("fce_anamnesis")
     .select("*")
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .maybeSingle();
 
   if (error) return { success: false, error: error.message };
@@ -63,7 +64,7 @@ export async function upsertAnamnesis(
   const { data: existing } = await supabase
     .from("fce_anamnesis")
     .select("id")
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .maybeSingle();
 
   let id: string;
@@ -87,7 +88,7 @@ export async function upsertAnamnesis(
     const { data: created, error } = await supabase
       .from("fce_anamnesis")
       .insert({
-        patient_id: patientId,
+        id_paciente: patientId,
         ...parsed.data,
         created_by: user.id,
         ...(idClinica ? { id_clinica: idClinica } : {}),
@@ -114,7 +115,7 @@ export async function getLatestVitalSigns(
   const { data, error } = await supabase
     .from("fce_signos_vitales")
     .select("*")
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .order("recorded_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -140,8 +141,8 @@ export async function saveVitalSigns(
   const { data, error } = await supabase
     .from("fce_signos_vitales")
     .insert({
-      patient_id: patientId,
-      encounter_id: null, // Registro de M2 — sin encuentro activo
+      id_paciente: patientId,
+      id_encuentro: null, // Registro de M2 — sin encuentro activo
       ...parsed.data,
       recorded_by: user.id,
       recorded_at: new Date().toISOString(),

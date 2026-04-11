@@ -18,10 +18,14 @@ async function requireAuth() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function logAudit(supabase: any, userId: string, action: string, resourceType: string, resourceId: string) {
+async function logAudit(supabase: any, userId: string, accion: string, tablaAfectada: string, registroId: string) {
   try {
     await supabase.from("logs_auditoria").insert({
-      user_id: userId, action, resource_type: resourceType, resource_id: resourceId,
+      actor_id: userId,
+      actor_tipo: "profesional",
+      accion,
+      tabla_afectada: tablaAfectada,
+      registro_id: registroId,
     });
   } catch { /* no bloquea */ }
 }
@@ -42,8 +46,8 @@ async function getOrCreateEncounter(
   const { data: existing } = await supabase
     .from("fce_encuentros")
     .select("id")
-    .eq("patient_id", patientId)
-    .eq("practitioner_id", userId)
+    .eq("id_paciente", patientId)
+    .eq("id_profesional", userId)
     .eq("status", "en_progreso")
     .gte("created_at", todayStart.toISOString())
     .maybeSingle();
@@ -54,8 +58,8 @@ async function getOrCreateEncounter(
   const { data: created, error } = await supabase
     .from("fce_encuentros")
     .insert({
-      patient_id: patientId,
-      practitioner_id: userId,
+      id_paciente: patientId,
+      id_profesional: userId,
       especialidad,
       modalidad: "presencial",
       status: "en_progreso",
@@ -79,7 +83,7 @@ export async function getSoapNotes(
   const { data, error } = await supabase
     .from("fce_notas_soap")
     .select("*")
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .order("created_at", { ascending: false });
 
   if (error) return { success: false, error: error.message };
@@ -143,8 +147,8 @@ export async function upsertSoapNote(
     const { data: created, error } = await supabase
       .from("fce_notas_soap")
       .insert({
-        patient_id: patientId,
-        encounter_id: encounterId,
+        id_paciente: patientId,
+        id_encuentro: encounterId,
         ...parsed.data,
         firmado: false,
         created_by: user.id,
@@ -173,12 +177,12 @@ export async function signSoapNote(
   // Obtener nombre del profesional
   const { data: prof } = await supabase
     .from("profesionales")
-    .select("nombres, apellidos")
+    .select("nombre, apellidos")
     .eq("id", user.id)
     .single();
 
   const firmadoPor = prof
-    ? `${prof.nombres} ${prof.apellidos}`.trim()
+    ? `${prof.nombre} ${prof.apellidos}`.trim()
     : user.email ?? user.id;
 
   const { error } = await supabase
@@ -197,7 +201,7 @@ export async function signSoapNote(
   await supabase
     .from("fce_encuentros")
     .update({ status: "finalizado", ended_at: new Date().toISOString() })
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .eq("status", "en_progreso");
 
   await logAudit(supabase, user.id, "sign", "soap_note", noteId);

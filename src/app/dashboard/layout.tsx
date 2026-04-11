@@ -23,22 +23,22 @@ export default async function DashboardLayout({
   // Obtener datos del profesional desde la tabla `profesionales`
   const { data: profesional } = await supabase
     .from("profesionales")
-    .select("nombres, apellidos, especialidad, rol")
+    .select("nombre, apellidos, especialidad, rol")
     .eq("id", user.id)
     .single();
 
   // Fallback si aún no tiene registro en profesionales
-  const nombres = profesional?.nombres ?? user.email?.split("@")[0] ?? "Usuario";
+  const nombre = profesional?.nombre ?? user.email?.split("@")[0] ?? "Usuario";
   const apellidos = profesional?.apellidos ?? "";
   const especialidad = (profesional?.especialidad as Especialidad) ?? "kinesiologia";
   const rol = (profesional?.rol as Rol) ?? "profesional";
 
   const practitionerName = apellidos
-    ? `${nombres} ${apellidos}`
-    : nombres;
+    ? `${nombre} ${apellidos}`
+    : nombre;
 
-  // Iniciales: primera letra de nombres + primera letra de apellidos
-  const initials = [nombres[0], apellidos[0]]
+  // Iniciales: primera letra de nombre + primera letra de apellidos
+  const initials = [nombre[0], apellidos[0]]
     .filter(Boolean)
     .join("")
     .toUpperCase() || "U";

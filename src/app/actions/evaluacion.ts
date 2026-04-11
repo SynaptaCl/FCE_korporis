@@ -17,13 +17,14 @@ async function requireAuth() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function logAudit(supabase: any, userId: string, action: string, resourceId: string) {
+async function logAudit(supabase: any, userId: string, accion: string, registroId: string) {
   try {
     await supabase.from("logs_auditoria").insert({
-      user_id: userId,
-      action,
-      resource_type: "evaluacion",
-      resource_id: resourceId,
+      actor_id: userId,
+      actor_tipo: "profesional",
+      accion,
+      tabla_afectada: "fce_evaluaciones",
+      registro_id: registroId,
     });
   } catch { /* no bloquea */ }
 }
@@ -38,7 +39,7 @@ export async function getEvaluaciones(
   const { data, error } = await supabase
     .from("fce_evaluaciones")
     .select("*")
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .order("created_at", { ascending: false });
 
   if (error) return { success: false, error: error.message };
@@ -59,7 +60,7 @@ export async function upsertEvaluacion(
   const { data: existing } = await supabase
     .from("fce_evaluaciones")
     .select("id")
-    .eq("patient_id", patientId)
+    .eq("id_paciente", patientId)
     .eq("especialidad", especialidad)
     .eq("sub_area", subArea)
     .maybeSingle();
@@ -80,8 +81,8 @@ export async function upsertEvaluacion(
     const { data: created, error } = await supabase
       .from("fce_evaluaciones")
       .insert({
-        patient_id: patientId,
-        encounter_id: null,
+        id_paciente: patientId,
+        id_encuentro: null,
         especialidad,
         sub_area: subArea,
         data,

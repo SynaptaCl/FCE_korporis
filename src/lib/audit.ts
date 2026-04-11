@@ -1,29 +1,30 @@
-import type { AuditAction, AuditResourceType } from "@/types";
+import type { AuditAction, AuditActorTipo } from "@/types";
 
 /**
- * Creates an audit log entry object ready to insert into Supabase.
- * In v1, this returns the object. When Supabase is connected,
- * this will call supabase.from('audit_log').insert().
+ * Creates an audit log entry object ready to insert into logs_auditoria.
  */
 export function createAuditEntry({
-  userId,
-  action,
-  resourceType,
-  resourceId,
-  details,
+  actorId,
+  actorTipo = "profesional",
+  accion,
+  tablaAfectada,
+  registroId,
+  idClinica,
 }: {
-  userId: string;
-  action: AuditAction;
-  resourceType?: AuditResourceType;
-  resourceId?: string;
-  details?: Record<string, unknown>;
+  actorId: string;
+  actorTipo?: AuditActorTipo;
+  accion: AuditAction;
+  tablaAfectada?: string;
+  registroId?: string;
+  idClinica?: string;
 }) {
   return {
-    user_id: userId,
-    action,
-    resource_type: resourceType,
-    resource_id: resourceId,
-    details,
+    actor_id: actorId,
+    actor_tipo: actorTipo,
+    accion,
+    tabla_afectada: tablaAfectada,
+    registro_id: registroId,
+    ...(idClinica ? { id_clinica: idClinica } : {}),
     created_at: new Date().toISOString(),
   };
 }
