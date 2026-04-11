@@ -69,14 +69,14 @@ const MODULES = [
     label: "M5 · Consentimiento",
     icon: <FileSignature className="w-5 h-5" />,
     href: "consentimiento",
-    available: false,
+    available: true,
   },
   {
     id: "m6",
     label: "M6 · Auditoría",
     icon: <ShieldCheck className="w-5 h-5" />,
     href: "auditoria",
-    available: false,
+    available: true,
   },
 ] as const;
 
