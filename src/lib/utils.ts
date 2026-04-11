@@ -28,7 +28,8 @@ export function formatDate(date: Date | string): string {
   });
 }
 
-export function calculateAge(birthDate: Date | string): number {
+export function calculateAge(birthDate: Date | string | null | undefined): number | null {
+  if (!birthDate) return null;
   const birth = typeof birthDate === "string" ? new Date(birthDate) : birthDate;
   const today = new Date();
   let age = today.getFullYear() - birth.getFullYear();

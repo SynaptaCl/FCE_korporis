@@ -67,7 +67,7 @@ export default async function AnamnesisPage({
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>
           <p className="text-xs text-ink-3">
-            {formatRun(p.run)} · {age} años ·{" "}
+            {formatRun(p.run)} · {age !== null ? `${age} años` : "Sin registro"} ·{" "}
             {p.sexo_registral === "M"
               ? "Masculino"
               : p.sexo_registral === "F"

@@ -101,7 +101,7 @@ export default async function EvaluacionPage({
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>
           <p className="text-xs text-ink-3">
-            {formatRun(p.run)} · {age} años
+            {formatRun(p.run)} · {age !== null ? `${age} años` : "Sin registro"}
           </p>
         </div>
         <div className="ml-auto">

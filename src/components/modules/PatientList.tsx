@@ -111,7 +111,7 @@ export function PatientList({ patients }: PatientListProps) {
                 </span>
 
                 {/* Edad */}
-                <span className="text-sm text-ink-2">{age} años</span>
+                <span className="text-sm text-ink-2">{age !== null ? `${age} años` : "Sin registro"}</span>
 
                 {/* Previsión */}
                 <Badge variant={previsionVariant(patient.prevision.tipo)}>

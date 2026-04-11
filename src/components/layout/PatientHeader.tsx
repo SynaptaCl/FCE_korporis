@@ -53,7 +53,8 @@ export function PatientHeader({
               <span className="font-medium text-ink-1">RUN:</span> {patient.run}
             </span>
             <span>
-              <span className="font-medium text-ink-1">Edad:</span> {age} años ({patient.sexo_registral})
+              <span className="font-medium text-ink-1">Edad:</span>{" "}
+              {age !== null ? `${age} años` : "Sin registro"} ({patient.sexo_registral})
             </span>
             <span>
               <span className="font-medium text-ink-1">Previsión:</span> {previsionLabel}

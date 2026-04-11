@@ -62,7 +62,7 @@ const MODULES = [
     label: "M4 · Evolución SOAP",
     icon: <FileText className="w-5 h-5" />,
     href: "evolucion",
-    available: false,
+    available: true,
   },
   {
     id: "m5",
@@ -133,7 +133,8 @@ export default async function PatientDetailPage({
                 {formatRun(p.run)}
               </span>
               <span>
-                <span className="font-medium text-ink-1">Edad:</span> {age} años
+                <span className="font-medium text-ink-1">Edad:</span>{" "}
+                {age !== null ? `${age} años` : "Sin registro"}
               </span>
               <span>
                 <span className="font-medium text-ink-1">Sexo:</span>{" "}
@@ -203,7 +204,11 @@ export default async function PatientDetailPage({
             <DataField label="RUN" value={formatRun(p.run)} />
             <DataField
               label="Fecha nacimiento"
-              value={`${new Date(p.fecha_nacimiento + "T12:00:00").toLocaleDateString("es-CL")} (${age} años)`}
+              value={
+                p.fecha_nacimiento
+                  ? `${new Date(p.fecha_nacimiento + "T12:00:00").toLocaleDateString("es-CL")}${age !== null ? ` (${age} años)` : ""}`
+                  : "Sin registro"
+              }
             />
             <DataField label="Nacionalidad" value={p.nacionalidad} />
             <DataField label="Ocupación" value={p.ocupacion} />
