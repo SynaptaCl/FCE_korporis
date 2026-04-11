@@ -171,16 +171,8 @@ export async function signSoapNote(
 ): Promise<ActionResult<void>> {
   const { supabase, user } = await requireAuth();
 
-  // Obtener nombre del profesional
-  const { data: prof } = await supabase
-    .from("profesionales")
-    .select("nombre, apellidos")
-    .eq("id", user.id)
-    .single();
-
-  const firmadoPor = prof
-    ? `${prof.nombre} ${prof.apellidos}`.trim()
-    : user.id;
+  // firmado_por almacena el UUID del profesional (FK)
+  const firmadoPor = user.id;
 
   const { error } = await supabase
     .from("fce_notas_soap")

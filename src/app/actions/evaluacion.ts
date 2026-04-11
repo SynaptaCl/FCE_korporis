@@ -69,7 +69,7 @@ export async function upsertEvaluacion(
   if (existing?.id) {
     const { error } = await supabase
       .from("fce_evaluaciones")
-      .update({ data, updated_at: new Date().toISOString() })
+      .update({ data })
       .eq("id", existing.id);
 
     if (error) return { success: false, error: error.message };
