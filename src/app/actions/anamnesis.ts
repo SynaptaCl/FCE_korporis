@@ -18,7 +18,7 @@ async function requireAuth() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function logAudit(supabase: any, userId: string, accion: string, tablaAfectada: string, registroId: string) {
+async function logAudit(supabase: any, userId: string, accion: string, tablaAfectada: string, registroId: string, idPaciente?: string) {
   try {
     await supabase.from("logs_auditoria").insert({
       actor_id: userId,
@@ -26,6 +26,7 @@ async function logAudit(supabase: any, userId: string, accion: string, tablaAfec
       accion,
       tabla_afectada: tablaAfectada,
       registro_id: registroId,
+      ...(idPaciente ? { id_paciente: idPaciente } : {}),
     });
   } catch { /* no bloquea el flujo */ }
 }
@@ -81,7 +82,7 @@ export async function upsertAnamnesis(
 
     if (error) return { success: false, error: error.message };
     id = existing.id;
-    await logAudit(supabase, user.id, "update", "anamnesis", id);
+    await logAudit(supabase, user.id, "update", "anamnesis", id, patientId);
   } else {
     // INSERT
     const idClinica = await getIdClinica(supabase, user.id);
@@ -98,7 +99,7 @@ export async function upsertAnamnesis(
 
     if (error) return { success: false, error: error.message };
     id = created.id;
-    await logAudit(supabase, user.id, "create", "anamnesis", id);
+    await logAudit(supabase, user.id, "create", "anamnesis", id, patientId);
   }
 
   revalidatePath(`/dashboard/pacientes/${patientId}/anamnesis`);
@@ -151,7 +152,7 @@ export async function saveVitalSigns(
 
   if (error) return { success: false, error: error.message };
 
-  await logAudit(supabase, user.id, "create", "vital_signs", data.id);
+  await logAudit(supabase, user.id, "create", "vital_signs", data.id, patientId);
 
   revalidatePath(`/dashboard/pacientes/${patientId}/anamnesis`);
   return { success: true, data: { id: data.id } };

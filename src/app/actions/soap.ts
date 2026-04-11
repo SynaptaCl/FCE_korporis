@@ -18,7 +18,7 @@ async function requireAuth() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function logAudit(supabase: any, userId: string, accion: string, tablaAfectada: string, registroId: string) {
+async function logAudit(supabase: any, userId: string, accion: string, tablaAfectada: string, registroId: string, idPaciente?: string) {
   try {
     await supabase.from("logs_auditoria").insert({
       actor_id: userId,
@@ -26,6 +26,7 @@ async function logAudit(supabase: any, userId: string, accion: string, tablaAfec
       accion,
       tabla_afectada: tablaAfectada,
       registro_id: registroId,
+      ...(idPaciente ? { id_paciente: idPaciente } : {}),
     });
   } catch { /* no bloquea */ }
 }
@@ -133,7 +134,7 @@ export async function upsertSoapNote(
 
     if (error) return { success: false, error: error.message };
     id = noteId;
-    await logAudit(supabase, user.id, "update", "soap_note", id);
+    await logAudit(supabase, user.id, "update", "soap_note", id, patientId);
   } else {
     // CREATE — auto-crear encuentro
     let encounterId: string;
@@ -156,7 +157,7 @@ export async function upsertSoapNote(
 
     if (error) return { success: false, error: error.message };
     id = created.id;
-    await logAudit(supabase, user.id, "create", "soap_note", id);
+    await logAudit(supabase, user.id, "create", "soap_note", id, patientId);
   }
 
   revalidatePath(`/dashboard/pacientes/${patientId}/evolucion`);
@@ -193,7 +194,7 @@ export async function signSoapNote(
     .eq("id_paciente", patientId)
     .eq("status", "en_progreso");
 
-  await logAudit(supabase, user.id, "sign", "soap_note", noteId);
+  await logAudit(supabase, user.id, "sign", "soap_note", noteId, patientId);
 
   revalidatePath(`/dashboard/pacientes/${patientId}/evolucion`);
   return { success: true, data: undefined };

@@ -43,18 +43,21 @@ async function logAudit(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   userId: string,
-  action: string,
-  resourceType: string,
-  resourceId: string,
-  details?: Record<string, unknown>
+  accion: string,
+  tablaAfectada: string,
+  registroId: string,
+  idClinica?: string | null,
+  idPaciente?: string | null
 ) {
   try {
     await supabase.from("logs_auditoria").insert({
-      user_id: userId,
-      action,
-      resource_type: resourceType,
-      resource_id: resourceId,
-      details: details ?? null,
+      actor_id: userId,
+      actor_tipo: "profesional",
+      accion,
+      tabla_afectada: tablaAfectada,
+      registro_id: registroId,
+      ...(idClinica ? { id_clinica: idClinica } : {}),
+      ...(idPaciente ? { id_paciente: idPaciente } : {}),
     });
   } catch {
     // El audit log no debe romper el flujo principal
@@ -90,7 +93,7 @@ export async function getPatientById(
 
   if (error) return { success: false, error: error.message };
 
-  await logAudit(supabase, user.id, "read", "patient", id);
+  await logAudit(supabase, user.id, "read", "pacientes", id);
 
   return { success: true, data: data as Patient };
 }
@@ -126,10 +129,7 @@ export async function createPatient(
     return { success: false, error: error.message };
   }
 
-  await logAudit(supabase, user.id, "create", "patient", data.id, {
-    rut: payload.rut,
-    creado_por: user.id,
-  });
+  await logAudit(supabase, user.id, "create", "pacientes", data.id, idClinica, data.id);
 
   revalidatePath("/dashboard/pacientes");
   return { success: true, data: { id: data.id } };
@@ -166,10 +166,7 @@ export async function updatePatient(
     return { success: false, error: error.message };
   }
 
-  await logAudit(supabase, user.id, "update", "patient", id, {
-    rut: payload.rut,
-    actualizado_por: user.id,
-  });
+  await logAudit(supabase, user.id, "update", "pacientes", id, null, id);
 
   revalidatePath("/dashboard/pacientes");
   revalidatePath(`/dashboard/pacientes/${id}`);

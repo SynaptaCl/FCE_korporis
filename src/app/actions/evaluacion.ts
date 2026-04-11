@@ -16,7 +16,7 @@ async function requireAuth() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function logAudit(supabase: any, userId: string, accion: string, registroId: string) {
+async function logAudit(supabase: any, userId: string, accion: string, registroId: string, idPaciente?: string) {
   try {
     await supabase.from("logs_auditoria").insert({
       actor_id: userId,
@@ -24,6 +24,7 @@ async function logAudit(supabase: any, userId: string, accion: string, registroI
       accion,
       tabla_afectada: "fce_evaluaciones",
       registro_id: registroId,
+      ...(idPaciente ? { id_paciente: idPaciente } : {}),
     });
   } catch { /* no bloquea */ }
 }
@@ -74,7 +75,7 @@ export async function upsertEvaluacion(
 
     if (error) return { success: false, error: error.message };
     id = existing.id;
-    await logAudit(supabase, user.id, "update", id);
+    await logAudit(supabase, user.id, "update", id, patientId);
   } else {
     const { data: created, error } = await supabase
       .from("fce_evaluaciones")
@@ -91,7 +92,7 @@ export async function upsertEvaluacion(
 
     if (error) return { success: false, error: error.message };
     id = created.id;
-    await logAudit(supabase, user.id, "create", id);
+    await logAudit(supabase, user.id, "create", id, patientId);
   }
 
   revalidatePath(`/dashboard/pacientes/${patientId}/evaluacion`);
