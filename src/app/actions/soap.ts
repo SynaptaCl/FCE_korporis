@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { soapSchema } from "@/lib/validations";
 import type { ActionResult } from "./patients";
+import { getIdClinica } from "./patients";
 import type { SoapNote } from "@/types";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ async function getOrCreateEncounter(
 
   if (existing?.id) return existing.id as string;
 
+  const idClinica = await getIdClinica(supabase, userId);
   const { data: created, error } = await supabase
     .from("fce_encuentros")
     .insert({
@@ -58,6 +60,7 @@ async function getOrCreateEncounter(
       modalidad: "presencial",
       status: "en_progreso",
       started_at: new Date().toISOString(),
+      ...(idClinica ? { id_clinica: idClinica } : {}),
     })
     .select("id")
     .single();
@@ -136,6 +139,7 @@ export async function upsertSoapNote(
       return { success: false, error: (e as Error).message };
     }
 
+    const idClinica = await getIdClinica(supabase, user.id);
     const { data: created, error } = await supabase
       .from("fce_notas_soap")
       .insert({
@@ -144,6 +148,7 @@ export async function upsertSoapNote(
         ...parsed.data,
         firmado: false,
         created_by: user.id,
+        ...(idClinica ? { id_clinica: idClinica } : {}),
       })
       .select("id")
       .single();

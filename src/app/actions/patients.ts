@@ -25,6 +25,18 @@ async function requireAuth() {
   return { supabase, user };
 }
 
+// ── Helper: id_clinica del usuario autenticado ─────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getIdClinica(supabase: any, userId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("admin_users")
+    .select("id_clinica")
+    .eq("auth_id", userId)
+    .single();
+  return (data?.id_clinica as string) ?? null;
+}
+
 // ── Helper: audit log ──────────────────────────────────────────────────────
 
 async function logAudit(
@@ -95,8 +107,11 @@ export async function createPatient(
 
   const { supabase, user } = await requireAuth();
 
-  // Normalizar RUN al formato canónico XX.XXX.XXX-K antes de persistir
-  const payload = { ...parsed.data, rut: formatRut(parsed.data.rut) };
+  const idClinica = await getIdClinica(supabase, user.id);
+  if (!idClinica) return { success: false, error: "No se encontró la clínica asociada al usuario." };
+
+  // Normalizar RUT al formato canónico XX.XXX.XXX-K antes de persistir
+  const payload = { ...parsed.data, rut: formatRut(parsed.data.rut), id_clinica: idClinica };
 
   const { data, error } = await supabase
     .from("pacientes")

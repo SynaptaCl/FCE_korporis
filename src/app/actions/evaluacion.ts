@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "./patients";
+import { getIdClinica } from "./patients";
 import type { Evaluation } from "@/types";
 
 // ── Helper ─────────────────────────────────────────────────────────────────
@@ -75,6 +76,7 @@ export async function upsertEvaluacion(
     id = existing.id;
     await logAudit(supabase, user.id, "update", id);
   } else {
+    const idClinica = await getIdClinica(supabase, user.id);
     const { data: created, error } = await supabase
       .from("fce_evaluaciones")
       .insert({
@@ -84,6 +86,7 @@ export async function upsertEvaluacion(
         sub_area: subArea,
         data,
         created_by: user.id,
+        ...(idClinica ? { id_clinica: idClinica } : {}),
       })
       .select("id")
       .single();

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { anamnesisSchema, vitalSignsSchema, type AnamnesisSchemaType, type VitalSignsSchemaType } from "@/lib/validations";
 import type { Anamnesis, VitalSigns } from "@/types";
 import type { ActionResult } from "./patients";
+import { getIdClinica } from "./patients";
 
 // ── Helper ─────────────────────────────────────────────────────────────────
 
@@ -82,12 +83,14 @@ export async function upsertAnamnesis(
     await logAudit(supabase, user.id, "update", "anamnesis", id);
   } else {
     // INSERT
+    const idClinica = await getIdClinica(supabase, user.id);
     const { data: created, error } = await supabase
       .from("fce_anamnesis")
       .insert({
         patient_id: patientId,
         ...parsed.data,
         created_by: user.id,
+        ...(idClinica ? { id_clinica: idClinica } : {}),
       })
       .select("id")
       .single();
@@ -133,6 +136,7 @@ export async function saveVitalSigns(
 
   const { supabase, user } = await requireAuth();
 
+  const idClinica = await getIdClinica(supabase, user.id);
   const { data, error } = await supabase
     .from("fce_signos_vitales")
     .insert({
@@ -141,6 +145,7 @@ export async function saveVitalSigns(
       ...parsed.data,
       recorded_by: user.id,
       recorded_at: new Date().toISOString(),
+      ...(idClinica ? { id_clinica: idClinica } : {}),
     })
     .select("id")
     .single();
