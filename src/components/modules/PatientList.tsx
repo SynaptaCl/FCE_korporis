@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, UserPlus, ChevronRight, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { calculateAge, formatRun, cn } from "@/lib/utils";
+import { calculateAge, formatRut, cn } from "@/lib/utils";
 import type { Patient } from "@/types";
 
 interface PatientListProps {
@@ -33,7 +33,7 @@ export function PatientList({ patients }: PatientListProps) {
     if (!query.trim()) return patients;
     const q = query.toLowerCase().replace(/[.\-\s]/g, "");
     return patients.filter((p) => {
-      const runClean = (p.run ?? "").replace(/[.\-\s]/g, "").toLowerCase();
+      const runClean = (p.rut ?? "").replace(/[.\-\s]/g, "").toLowerCase();
       const fullName =
         [p.nombre, p.apellido_paterno, p.apellido_materno].filter(Boolean).join(" ").toLowerCase();
       return runClean.includes(q) || fullName.includes(q.toLowerCase());
@@ -85,7 +85,7 @@ export function PatientList({ patients }: PatientListProps) {
           {/* Rows */}
           {filtered.map((patient, idx) => {
             const age = calculateAge(patient.fecha_nacimiento);
-            const run = formatRun(patient.run);
+            const run = formatRut(patient.rut);
             const fullName = [patient.apellido_paterno, patient.apellido_materno].filter(Boolean).join(" ") + (patient.nombre ? `, ${patient.nombre}` : "");
 
             return (

@@ -19,7 +19,7 @@ export interface Prevision {
 
 export interface Patient {
   id: string;
-  run: string | null;
+  rut: string | null;
   nombre: string | null;
   apellido_paterno: string | null;
   apellido_materno: string | null;

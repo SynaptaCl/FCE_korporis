@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { KinesiologiaEval } from "@/components/modules/KinesiologiaEval";
 import { FonoaudiologiaEval } from "@/components/modules/FonoaudiologiaEval";
 import { MasoterapiaEval } from "@/components/modules/MasoterapiaEval";
-import { calculateAge, formatRun } from "@/lib/utils";
+import { calculateAge, formatRut } from "@/lib/utils";
 import { ESPECIALIDAD_LABELS } from "@/lib/constants";
 import type { Especialidad } from "@/lib/constants";
 import type { Evaluation } from "@/types";
@@ -101,7 +101,7 @@ export default async function EvaluacionPage({
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>
           <p className="text-xs text-ink-3">
-            {formatRun(p.run)} · {age !== null ? `${age} años` : "Sin registro"}
+            {formatRut(p.rut)} · {age !== null ? `${age} años` : "Sin registro"}
           </p>
         </div>
         <div className="ml-auto">

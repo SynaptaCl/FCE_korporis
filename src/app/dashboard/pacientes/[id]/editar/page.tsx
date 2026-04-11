@@ -4,7 +4,7 @@ import { ChevronLeft, Pencil } from "lucide-react";
 import { getPatientById } from "@/app/actions/patients";
 import { PatientForm } from "@/components/modules/PatientForm";
 import { Card } from "@/components/ui/Card";
-import { formatRun } from "@/lib/utils";
+import { formatRut } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -59,9 +59,9 @@ export default async function EditarPacientePage({
           Editar Ficha — M1
         </h2>
         <p className="text-sm text-ink-3 mt-0.5">
-          RUN:{" "}
+          RUT:{" "}
           <span className="font-mono font-semibold text-ink-2">
-            {formatRun(patient.run)}
+            {formatRut(patient.rut)}
           </span>{" "}
           · {fullName}
         </p>

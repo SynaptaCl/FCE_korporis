@@ -8,7 +8,7 @@ import { getEvaluaciones } from "@/app/actions/evaluacion";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { SoapForm } from "@/components/modules/SoapForm";
-import { calculateAge, formatRun } from "@/lib/utils";
+import { calculateAge, formatRut } from "@/lib/utils";
 import type { SoapNote } from "@/types";
 
 export async function generateMetadata({
@@ -101,7 +101,7 @@ export default async function EvolucionPage({
         </div>
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>
-          <p className="text-xs text-ink-3">{formatRun(p.run)} · {age !== null ? `${age} años` : "Sin registro"}</p>
+          <p className="text-xs text-ink-3">{formatRut(p.rut)} · {age !== null ? `${age} años` : "Sin registro"}</p>
         </div>
         <div className="ml-auto flex items-center gap-2">
           {draftNotes.length > 0 && (

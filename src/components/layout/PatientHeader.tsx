@@ -50,7 +50,7 @@ export function PatientHeader({
           </h2>
           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-sm text-ink-2">
             <span>
-              <span className="font-medium text-ink-1">RUN:</span> {patient.run}
+              <span className="font-medium text-ink-1">RUT:</span> {patient.rut}
             </span>
             <span>
               <span className="font-medium text-ink-1">Edad:</span>{" "}

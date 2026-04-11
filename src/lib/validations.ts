@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateRun } from "./run-validator";
+import { validateRut } from "./run-validator";
 
 // ── Patient ──
 
@@ -23,9 +23,9 @@ export const previsionSchema = z.object({
 });
 
 export const patientSchema = z.object({
-  run: z.string()
-    .min(1, "RUN es obligatorio")
-    .refine(validateRun, "RUN inválido (dígito verificador no coincide)"),
+  rut: z.string()
+    .min(1, "RUT es obligatorio")
+    .refine(validateRut, "RUT inválido (dígito verificador no coincide)"),
   nombre: z.string().min(2, "Nombre es obligatorio"),
   apellido_paterno: z.string().min(2, "Apellido paterno es obligatorio"),
   apellido_materno: z.string().min(2, "Apellido materno es obligatorio"),

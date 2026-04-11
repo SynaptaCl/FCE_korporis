@@ -17,7 +17,7 @@ import { getPatientById } from "@/app/actions/patients";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { calculateAge, formatRun, cn } from "@/lib/utils";
+import { calculateAge, formatRut, cn } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -129,8 +129,8 @@ export default async function PatientDetailPage({
             <h2 className="text-xl font-bold text-ink-1">{fullName}</h2>
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1.5 text-sm text-ink-2">
               <span>
-                <span className="font-medium text-ink-1">RUN:</span>{" "}
-                {formatRun(p.run)}
+                <span className="font-medium text-ink-1">RUT:</span>{" "}
+                {formatRut(p.rut)}
               </span>
               <span>
                 <span className="font-medium text-ink-1">Edad:</span>{" "}
@@ -203,7 +203,7 @@ export default async function PatientDetailPage({
         {/* Datos personales */}
         <Card title="Datos Personales" icon={<User className="w-4 h-4" />}>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
-            <DataField label="RUN" value={formatRun(p.run)} />
+            <DataField label="RUT" value={formatRut(p.rut)} />
             <DataField
               label="Fecha nacimiento"
               value={

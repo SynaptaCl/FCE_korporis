@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { patientSchema, type PatientSchemaType } from "@/lib/validations";
-import { formatRun } from "@/lib/run-validator";
+import { formatRut } from "@/lib/run-validator";
 import type { Patient } from "@/types";
 
 // ── Tipos de respuesta ─────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ export async function createPatient(
   const { supabase, user } = await requireAuth();
 
   // Normalizar RUN al formato canónico XX.XXX.XXX-K antes de persistir
-  const payload = { ...parsed.data, run: formatRun(parsed.data.run) };
+  const payload = { ...parsed.data, rut: formatRut(parsed.data.rut) };
 
   const { data, error } = await supabase
     .from("pacientes")
@@ -112,7 +112,7 @@ export async function createPatient(
   }
 
   await logAudit(supabase, user.id, "create", "patient", data.id, {
-    run: payload.run,
+    rut: payload.rut,
     creado_por: user.id,
   });
 
@@ -135,7 +135,7 @@ export async function updatePatient(
 
   const payload = {
     ...parsed.data,
-    run: formatRun(parsed.data.run),
+    rut: formatRut(parsed.data.rut),
     updated_at: new Date().toISOString(),
   };
 
@@ -152,7 +152,7 @@ export async function updatePatient(
   }
 
   await logAudit(supabase, user.id, "update", "patient", id, {
-    run: payload.run,
+    rut: payload.rut,
     actualizado_por: user.id,
   });
 

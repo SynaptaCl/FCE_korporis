@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatRun(run: string | null | undefined): string {
+export function formatRut(run: string | null | undefined): string {
   if (!run) return "—";
   const clean = run.replace(/[^0-9kK]/g, "");
   if (clean.length < 2) return clean;

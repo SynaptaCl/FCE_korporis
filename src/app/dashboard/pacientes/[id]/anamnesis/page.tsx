@@ -6,7 +6,7 @@ import { getAnamnesis, getLatestVitalSigns } from "@/app/actions/anamnesis";
 import { Card } from "@/components/ui/Card";
 import { AnamnesisForm } from "@/components/modules/AnamnesisForm";
 import { VitalSignsPanel } from "@/components/modules/VitalSignsPanel";
-import { calculateAge, formatRun } from "@/lib/utils";
+import { calculateAge, formatRut } from "@/lib/utils";
 
 export async function generateMetadata({
   params,
@@ -67,7 +67,7 @@ export default async function AnamnesisPage({
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>
           <p className="text-xs text-ink-3">
-            {formatRun(p.run)} · {age !== null ? `${age} años` : "Sin registro"} ·{" "}
+            {formatRut(p.rut)} · {age !== null ? `${age} años` : "Sin registro"} ·{" "}
             {p.sexo_registral === "M"
               ? "Masculino"
               : p.sexo_registral === "F"

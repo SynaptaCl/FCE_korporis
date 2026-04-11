@@ -1,10 +1,10 @@
 /**
- * Validación de RUN chileno usando algoritmo Módulo 11.
- * El RUN (Rol Único Nacional) es el identificador civil obligatorio en Chile.
+ * Validación de RUT chileno usando algoritmo Módulo 11.
+ * El RUT (Rol Único Tributario) es el identificador civil obligatorio en Chile.
  */
 
-export function cleanRun(run: string): string {
-  return run.replace(/[^0-9kK]/g, "").toUpperCase();
+export function cleanRut(rut: string): string {
+  return rut.replace(/[^0-9kK]/g, "").toUpperCase();
 }
 
 export function calculateDV(body: string): string {
@@ -23,8 +23,8 @@ export function calculateDV(body: string): string {
   return remainder.toString();
 }
 
-export function validateRun(run: string): boolean {
-  const clean = cleanRun(run);
+export function validateRut(rut: string): boolean {
+  const clean = cleanRut(rut);
   if (clean.length < 2) return false;
 
   const body = clean.slice(0, -1);
@@ -40,8 +40,8 @@ export function validateRun(run: string): boolean {
   return calculateDV(body) === dv;
 }
 
-export function formatRun(run: string): string {
-  const clean = cleanRun(run);
+export function formatRut(rut: string): string {
+  const clean = cleanRut(rut);
   if (clean.length < 2) return clean;
 
   const body = clean.slice(0, -1);
@@ -50,3 +50,8 @@ export function formatRun(run: string): string {
 
   return `${formatted}-${dv}`;
 }
+
+// Backward-compat aliases (remove once all callers updated)
+export const cleanRun = cleanRut;
+export const validateRun = validateRut;
+export const formatRun = formatRut;

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle, XCircle, User, MapPin, Shield, Phone } from "lucide-react";
 import { patientSchema } from "@/lib/validations";
 import type { z } from "zod";
-import { cleanRun, formatRun, validateRun } from "@/lib/run-validator";
+import { cleanRut, formatRut, validateRut } from "@/lib/run-validator";
 import { calculateAge, cn } from "@/lib/utils";
 import { REGIONES_CHILE } from "@/lib/constants";
 import { Input } from "@/components/ui/Input";
@@ -57,7 +57,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
 
   const defaultValues: Partial<z.input<typeof patientSchema>> = initialData
     ? {
-        run: cleanRun(initialData.run ?? ""),
+        rut: cleanRut(initialData.rut ?? ""),
         nombre: initialData.nombre ?? "",
         apellido_paterno: initialData.apellido_paterno ?? "",
         apellido_materno: initialData.apellido_materno ?? "",
@@ -129,29 +129,29 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
         title="Datos Personales"
         icon={<User className="w-4 h-4" />}
       >
-        {/* RUN — validación en tiempo real */}
+        {/* RUT — validación en tiempo real */}
         <Controller
-          name="run"
+          name="rut"
           control={control}
           render={({ field }) => {
             const isValid =
               field.value && field.value.length >= 2
-                ? validateRun(field.value)
+                ? validateRut(field.value)
                 : null;
             const display = field.value
-              ? formatRun(field.value)
+              ? formatRut(field.value)
               : "";
 
             return (
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-ink-1">
-                  RUN <span className="text-kp-danger">*</span>
+                  RUT <span className="text-kp-danger">*</span>
                 </label>
                 <div className="relative">
                   <input
                     value={display}
                     onChange={(e) =>
-                      field.onChange(cleanRun(e.target.value))
+                      field.onChange(cleanRut(e.target.value))
                     }
                     onBlur={field.onBlur}
                     placeholder="12.345.678-K"
@@ -160,7 +160,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
                       "w-full px-3 py-2 pr-10 text-sm text-ink-1 bg-surface-1 border rounded-lg",
                       "placeholder:text-ink-4 outline-none transition-colors",
                       "focus:ring-2 focus:ring-kp-accent/30 focus:border-kp-accent",
-                      errors.run ? "border-kp-danger" : "border-kp-border"
+                      errors.rut ? "border-kp-danger" : "border-kp-border"
                     )}
                   />
                   {isValid !== null && (
@@ -178,8 +178,8 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
                     </span>
                   )}
                 </div>
-                {errors.run && (
-                  <p className="text-xs text-kp-danger">{errors.run.message}</p>
+                {errors.rut && (
+                  <p className="text-xs text-kp-danger">{errors.rut.message}</p>
                 )}
               </div>
             );
