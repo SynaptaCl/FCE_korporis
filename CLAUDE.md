@@ -67,10 +67,10 @@ src/
 ├── lib/
 │   ├── supabase/                 → Clients (browser + server) + types
 │   ├── constants.ts              → Datos clínica
-│   ├── utils.ts                  → cn() = clsx + tailwind-merge
-│   ├── run-validator.ts          → Validación RUN chileno (módulo 11)
+│   ├── utils.ts                  → cn() + calculateAge + formatRut
+│   ├── run-validator.ts          → Validación RUT chileno (módulo 11)
 │   ├── validations.ts            → Schemas Zod
-│   └── audit.ts                  → Helper audit log
+│   └── audit.ts                  → Helper createAuditEntry()
 ├── hooks/                        → useAuth, usePatient, useAudit
 ├── types/                        → Patient, Encounter, SOAP, CIF, Consent...
 docs/                             → Documentación de referencia (no se deploya)
@@ -78,12 +78,114 @@ supabase/migrations/              → SQL migraciones
 ```
 
 ## Módulos clínicos
-- **M1** — Identificación paciente (Decreto 41 MINSAL)
-- **M2** — Anamnesis + Red Flags + Signos Vitales
-- **M3** — Evaluación por especialidad (kine/fono/maso)
-- **M4** — Evolución SOAP + CIF Mapper
-- **M5** — Consentimiento informado (firma canvas)
+- **M1** — Identificación paciente (Decreto 41 MINSAL) ✅ completo
+- **M2** — Anamnesis + Red Flags + Signos Vitales ✅ completo
+- **M3** — Evaluación por especialidad (kine/fono/maso) ✅ completo
+- **M4** — Evolución SOAP + CIF Mapper ✅ completo
+- **M5** — Consentimiento informado (firma canvas) ✅ completo
 - **M6** — Auditoría (append-only, solo admin)
+
+## Convenciones DB — FUENTE DE VERDAD (no cambiar sin verificar schema real)
+
+### Tabla `pacientes`
+- Columna nombre: `nombre` (singular, NO `nombres`)
+- Columna identificación: `rut` (NO `run`)
+- Todos los campos son `nullable` — usar `?? "Sin registro"` en display
+
+### Tabla `profesionales`
+- Columna nombre: `nombre` (singular, NO `nombres`)
+- Columna apellidos: `apellidos`
+
+### Foreign keys — siempre en español con prefijo `id_`
+```
+id_paciente      (NO patient_id)
+id_encuentro     (NO encounter_id)
+id_profesional   (NO practitioner_id)
+id_clinica       (NO clinic_id)
+```
+
+### Tabla `logs_auditoria` — campos exactos
+```
+actor_id         (NO user_id)
+actor_tipo       "profesional" | "admin" | "sistema"
+accion           (NO action)
+tabla_afectada   (NO resource_type)
+registro_id      (NO resource_id)
+```
+
+### Tablas FCE con prefijo `fce_`
+```
+fce_anamnesis
+fce_signos_vitales
+fce_evaluaciones
+fce_encuentros
+fce_notas_soap
+```
+
+### RLS — todo INSERT debe incluir `id_clinica`
+Obtener siempre con `getIdClinica(supabase, user.id)` desde `patients.ts`.
+Si retorna null → hard-fail con mensaje al usuario, no insertar.
+
+### `admin_users` — lookup de id_clinica
+```typescript
+// Patrón canónico para obtener id_clinica del usuario autenticado:
+const { data } = await supabase
+  .from("admin_users")
+  .select("id_clinica")
+  .eq("auth_id", userId)
+  .single();
+```
+
+## Patrones de código consolidados
+
+### Campos nullable en Patient
+Todos los campos del tipo `Patient` son `string | null`. Patrón de display:
+```typescript
+// Display seguro
+patient.nombre ?? "Sin registro"
+patient.rut ?? "—"
+patient.prevision?.tipo ?? "Sin registro"
+patient.direccion?.region ?? "Sin registro"
+
+// fullName null-safe
+[patient.nombre, patient.apellido_paterno, patient.apellido_materno]
+  .filter(Boolean).join(" ")
+```
+
+### calculateAge — acepta null
+```typescript
+// src/lib/utils.ts
+calculateAge(fecha: Date | string | null | undefined): number | null
+// Display:
+const age = calculateAge(patient.fecha_nacimiento);
+age !== null ? `${age} años` : "Sin registro"
+```
+
+### formatRut — acepta null
+```typescript
+// src/lib/run-validator.ts — exports actuales:
+cleanRut, validateRut, formatRut
+// (aliases: cleanRun, validateRun, formatRun para compatibilidad)
+formatRut(null)  // → "—"
+```
+
+### logAudit — patrón canónico en server actions
+```typescript
+async function logAudit(
+  supabase: any, userId: string,
+  accion: string, tablaAfectada: string, registroId: string
+) {
+  try {
+    await supabase.from("logs_auditoria").insert({
+      actor_id: userId,
+      actor_tipo: "profesional",
+      accion,
+      tabla_afectada: tablaAfectada,
+      registro_id: registroId,
+    });
+  } catch { /* no bloquea el flujo */ }
+}
+```
 
 ## Comandos
 ```bash
