@@ -93,7 +93,7 @@ function SignatureCanvas({
     if (!ctx) return;
     ctx.lineTo(x, y);
     ctx.stroke();
-    setHasStrokes(true);
+    setHasStrokes((prev) => prev ? prev : true);  // only triggers re-render once
   }, []);
 
   const endDraw = useCallback(() => {
@@ -238,6 +238,14 @@ function ConsentCard({ consent }: { consent: Consent }) {
   );
 }
 
+// ── Module-level constants ─────────────────────────────────────────────────
+
+const TIPOS: { key: ConsentType; label: string; desc: string }[] = [
+  { key: "general", label: "General", desc: "Tratamiento estándar de salud" },
+  { key: "menores", label: "Menores / Vulnerables", desc: "Representante legal firma" },
+  { key: "teleconsulta", label: "Teleconsulta", desc: "Atención a distancia" },
+];
+
 // ── ConsentManager ─────────────────────────────────────────────────────────
 
 interface ConsentManagerProps {
@@ -263,6 +271,7 @@ export function ConsentManager({ patientId, consentimientos }: ConsentManagerPro
     setError(null);
     setFirmaDataUrl(null);
     setPendingConsentId(null);
+    setSuccess(null);
   };
 
   const handleCreate = async () => {
@@ -271,7 +280,7 @@ export function ConsentManager({ patientId, consentimientos }: ConsentManagerPro
     const result = await createConsentimiento(patientId, {
       tipo: selectedType,
       contenido: template.texto,
-      firma_paciente_data_url: "pending",
+      // firma_paciente_data_url removed — not needed at creation time
     });
     setLoading(false);
     if (!result.success) { setError(result.error); return; }
@@ -280,7 +289,10 @@ export function ConsentManager({ patientId, consentimientos }: ConsentManagerPro
   };
 
   const handleSign = async () => {
-    if (!firmaDataUrl || !pendingConsentId) return;
+    if (!firmaDataUrl || !pendingConsentId) {
+      setError("Error: no hay firma o consentimiento pendiente. Intente nuevamente.");
+      return;
+    }
     setLoading(true);
     setError(null);
     const result = await signConsentimiento(pendingConsentId, patientId, firmaDataUrl);
@@ -289,12 +301,6 @@ export function ConsentManager({ patientId, consentimientos }: ConsentManagerPro
     setSuccess("Consentimiento firmado y guardado correctamente.");
     resetFlow();
   };
-
-  const TIPOS: { key: ConsentType; label: string; desc: string }[] = [
-    { key: "general", label: "General", desc: "Tratamiento estándar de salud" },
-    { key: "menores", label: "Menores / Vulnerables", desc: "Representante legal firma" },
-    { key: "teleconsulta", label: "Teleconsulta", desc: "Atención a distancia" },
-  ];
 
   return (
     <div className="space-y-6">
