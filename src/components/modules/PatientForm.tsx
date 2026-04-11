@@ -58,7 +58,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
   const defaultValues: Partial<z.input<typeof patientSchema>> = initialData
     ? {
         run: cleanRun(initialData.run),
-        nombres: initialData.nombres,
+        nombre: initialData.nombre,
         apellido_paterno: initialData.apellido_paterno,
         apellido_materno: initialData.apellido_materno,
         fecha_nacimiento: initialData.fecha_nacimiento,
@@ -82,15 +82,14 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
     register,
     control,
     handleSubmit,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<z.input<typeof patientSchema>, unknown, z.output<typeof patientSchema>>({
     resolver: zodResolver(patientSchema),
     defaultValues,
   });
 
-  const previsionTipo = watch("prevision.tipo");
-  const fechaNacimiento = watch("fecha_nacimiento");
+  const previsionTipo = useWatch({ control, name: "prevision.tipo" });
+  const fechaNacimiento = useWatch({ control, name: "fecha_nacimiento" });
   const edad =
     fechaNacimiento && fechaNacimiento.length === 10
       ? calculateAge(fechaNacimiento)
@@ -193,8 +192,8 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
             label="Nombres"
             required
             placeholder="María Fernanda"
-            error={errors.nombres?.message}
-            {...register("nombres")}
+            error={errors.nombre?.message}
+            {...register("nombre")}
           />
         </div>
 

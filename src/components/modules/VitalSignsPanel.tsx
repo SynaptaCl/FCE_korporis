@@ -73,7 +73,7 @@ export function VitalSignsPanel({ patientId, latestVitalSigns }: VitalSignsPanel
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<VsFormType>({
     resolver: zodResolver(vsFormSchema),
@@ -94,7 +94,7 @@ export function VitalSignsPanel({ patientId, latestVitalSigns }: VitalSignsPanel
       : {},
   });
 
-  const watchedValues = watch();
+  const watchedValues = useWatch({ control });
 
   async function onSubmit(data: VsFormType) {
     // Solo guardar si hay al menos un campo con valor

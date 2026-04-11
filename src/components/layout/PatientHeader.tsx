@@ -20,9 +20,9 @@ export function PatientHeader({
   selectedSpecialty,
   onSpecialtyChange,
 }: PatientHeaderProps) {
-  const initials = `${patient.nombres.charAt(0)}${patient.apellido_paterno.charAt(0)}`;
+  const initials = `${patient.nombre?.charAt(0) ?? ""}${patient.apellido_paterno?.charAt(0) ?? ""}`;
   const age = calculateAge(patient.fecha_nacimiento);
-  const fullName = `${patient.nombres} ${patient.apellido_paterno} ${patient.apellido_materno}`;
+  const fullName = `${patient.nombre} ${patient.apellido_paterno} ${patient.apellido_materno}`;
   const previsionLabel =
     patient.prevision.tipo === "FONASA"
       ? `FONASA ${patient.prevision.tramo || ""}`

@@ -20,7 +20,7 @@ export async function generateMetadata({
   const result = await getPatientById(id);
   if (!result.success) return { title: "Evolución SOAP" };
   const p = result.data;
-  return { title: `Evolución SOAP — ${p.apellido_paterno} ${p.nombres}` };
+  return { title: `Evolución SOAP — ${p.apellido_paterno} ${p.nombre}` };
 }
 
 // ── Helper: resumen de última evaluación para pre-llenar O ─────────────────
@@ -78,7 +78,7 @@ export default async function EvolucionPage({
     activeNote = draftNotes[0] ?? null;
   }
 
-  const fullName = `${p.nombres} ${p.apellido_paterno} ${p.apellido_materno}`;
+  const fullName = `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`;
   const age = calculateAge(p.fecha_nacimiento);
 
   return (
@@ -97,7 +97,7 @@ export default async function EvolucionPage({
       {/* Patient summary */}
       <div className="bg-surface-1 rounded-xl border border-kp-border px-5 py-3 flex items-center gap-3">
         <div className="w-9 h-9 bg-kp-primary/10 border border-kp-accent/20 rounded-lg flex items-center justify-center text-kp-primary text-sm font-bold shrink-0">
-          {`${p.nombres[0]}${p.apellido_paterno[0]}`.toUpperCase()}
+          {`${p.nombre[0]}${p.apellido_paterno[0]}`.toUpperCase()}
         </div>
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>

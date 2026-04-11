@@ -6,3 +6,5 @@ export { VitalSignsPanel } from "./VitalSignsPanel";
 export { KinesiologiaEval } from "./KinesiologiaEval";
 export { FonoaudiologiaEval } from "./FonoaudiologiaEval";
 export { MasoterapiaEval } from "./MasoterapiaEval";
+export { SoapForm } from "./SoapForm";
+export { CifMapper } from "./CifMapper";

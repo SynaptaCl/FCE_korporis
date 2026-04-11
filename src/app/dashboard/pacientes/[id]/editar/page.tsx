@@ -15,7 +15,7 @@ export async function generateMetadata({
   const result = await getPatientById(id);
   if (!result.success) return { title: "Editar Paciente" };
   const p = result.data;
-  return { title: `Editar — ${p.apellido_paterno} ${p.nombres}` };
+  return { title: `Editar — ${p.apellido_paterno} ${p.nombre}` };
 }
 
 export default async function EditarPacientePage({
@@ -29,7 +29,7 @@ export default async function EditarPacientePage({
   if (!result.success) notFound();
 
   const patient = result.data;
-  const fullName = `${patient.nombres} ${patient.apellido_paterno} ${patient.apellido_materno}`;
+  const fullName = `${patient.nombre} ${patient.apellido_paterno} ${patient.apellido_materno}`;
 
   return (
     <div className="max-w-2xl space-y-5">

@@ -163,7 +163,7 @@ function MSKForm({ patientId, initialData, readOnly }: SubFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const d = initialData as Partial<MSKFormData>;
-  const { register, control, handleSubmit, watch, setValue, formState: { isSubmitting } } =
+  const { register, control, handleSubmit, setValue, formState: { isSubmitting } } =
     useForm<MSKFormData>({
       defaultValues: {
         dolor_eva: (d.dolor_eva as number) ?? 0,
@@ -175,8 +175,7 @@ function MSKForm({ patientId, initialData, readOnly }: SubFormProps) {
     });
 
   const danielsFields = useFieldArray({ control, name: "fuerza_daniels" });
-  const evaValue = watch("dolor_eva");
-  const zonasValue = watch("zonas_dolor");
+  const zonasValue = useWatch({ control, name: "zonas_dolor" });
 
   async function onSubmit(data: MSKFormData) {
     setServerError(null);

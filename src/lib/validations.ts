@@ -26,7 +26,7 @@ export const patientSchema = z.object({
   run: z.string()
     .min(1, "RUN es obligatorio")
     .refine(validateRun, "RUN inválido (dígito verificador no coincide)"),
-  nombres: z.string().min(2, "Nombres es obligatorio"),
+  nombre: z.string().min(2, "Nombre es obligatorio"),
   apellido_paterno: z.string().min(2, "Apellido paterno es obligatorio"),
   apellido_materno: z.string().min(2, "Apellido materno es obligatorio"),
   fecha_nacimiento: z.string().min(1, "Fecha de nacimiento es obligatoria"),

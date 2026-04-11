@@ -35,7 +35,7 @@ export function PatientList({ patients }: PatientListProps) {
     return patients.filter((p) => {
       const runClean = p.run.replace(/[.\-\s]/g, "").toLowerCase();
       const fullName =
-        `${p.nombres} ${p.apellido_paterno} ${p.apellido_materno}`.toLowerCase();
+        `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`.toLowerCase();
       return runClean.includes(q) || fullName.includes(q.toLowerCase());
     });
   }, [patients, query]);
@@ -86,7 +86,7 @@ export function PatientList({ patients }: PatientListProps) {
           {filtered.map((patient, idx) => {
             const age = calculateAge(patient.fecha_nacimiento);
             const run = formatRun(patient.run);
-            const fullName = `${patient.apellido_paterno} ${patient.apellido_materno}, ${patient.nombres}`;
+            const fullName = `${patient.apellido_paterno} ${patient.apellido_materno}, ${patient.nombre}`;
 
             return (
               <button

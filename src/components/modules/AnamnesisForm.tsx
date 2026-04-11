@@ -92,7 +92,6 @@ export function AnamnesisForm({ patientId, initialData }: AnamnesisFormProps) {
     register,
     control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<AnamnesisSchemaType>({
@@ -124,7 +123,7 @@ export function AnamnesisForm({ patientId, initialData }: AnamnesisFormProps) {
   const farmacologia = useFieldArray({ control, name: "farmacologia" });
   const alergias = useFieldArray({ control, name: "alergias" });
 
-  const redFlags = watch("red_flags");
+  const redFlags = useWatch({ control, name: "red_flags" });
   const activeFlags = Object.values(redFlags).filter(Boolean).length;
 
   // ── Submit ─────────────────────────────────────────────────────────────

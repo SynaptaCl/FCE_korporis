@@ -263,7 +263,7 @@ function TisularForm({ patientId, initialData, readOnly }: SubFormProps) {
   const [serverError, setServerError] = useState<string | null>(null);
   const d = initialData as Partial<TisularFormData>;
 
-  const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } =
+  const { register, control, handleSubmit, setValue, formState: { isSubmitting } } =
     useForm<TisularFormData>({
       defaultValues: {
         zonas_tension: (d.zonas_tension as string[]) ?? [],
@@ -274,7 +274,7 @@ function TisularForm({ patientId, initialData, readOnly }: SubFormProps) {
       },
     });
 
-  const zonasValue = watch("zonas_tension");
+  const zonasValue = useWatch({ control, name: "zonas_tension" });
 
   async function onSubmit(data: TisularFormData) {
     setServerError(null); setSaved(false);

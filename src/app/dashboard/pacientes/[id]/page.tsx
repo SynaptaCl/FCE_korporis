@@ -29,7 +29,7 @@ export async function generateMetadata({
   if (!result.success) return { title: "Paciente" };
   const p = result.data;
   return {
-    title: `${p.apellido_paterno} ${p.nombres}`,
+    title: `${p.apellido_paterno} ${p.nombre}`,
   };
 }
 
@@ -94,8 +94,8 @@ export default async function PatientDetailPage({
 
   const p = result.data;
   const age = calculateAge(p.fecha_nacimiento);
-  const fullName = `${p.nombres} ${p.apellido_paterno} ${p.apellido_materno}`;
-  const initials = `${p.nombres?.[0] ?? ""}${p.apellido_paterno?.[0] ?? ""}`.toUpperCase() || "?";
+  const fullName = `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`;
+  const initials = `${p.nombre?.[0] ?? ""}${p.apellido_paterno?.[0] ?? ""}`.toUpperCase() || "?";
 
   const previsionLabel =
     p.prevision?.tipo === "FONASA"

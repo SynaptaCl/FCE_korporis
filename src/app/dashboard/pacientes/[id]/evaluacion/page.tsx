@@ -23,7 +23,7 @@ export async function generateMetadata({
   const result = await getPatientById(id);
   if (!result.success) return { title: "Evaluación" };
   const p = result.data;
-  return { title: `Evaluación — ${p.apellido_paterno} ${p.nombres}` };
+  return { title: `Evaluación — ${p.apellido_paterno} ${p.nombre}` };
 }
 
 // ── Especialidad tabs ──────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ export default async function EvaluacionPage({
   const evalsByEsp = (esp: string): Evaluation[] =>
     allEvals.filter((e) => e.especialidad === esp);
 
-  const fullName = `${p.nombres} ${p.apellido_paterno} ${p.apellido_materno}`;
+  const fullName = `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`;
   const age = calculateAge(p.fecha_nacimiento);
 
   return (
@@ -96,7 +96,7 @@ export default async function EvaluacionPage({
       {/* Patient summary */}
       <div className="bg-surface-1 rounded-xl border border-kp-border px-5 py-3 flex items-center gap-3">
         <div className="w-9 h-9 bg-kp-primary/10 border border-kp-accent/20 rounded-lg flex items-center justify-center text-kp-primary text-sm font-bold shrink-0">
-          {`${p.nombres[0]}${p.apellido_paterno[0]}`.toUpperCase()}
+          {`${p.nombre[0]}${p.apellido_paterno[0]}`.toUpperCase()}
         </div>
         <div>
           <p className="text-sm font-semibold text-ink-1">{fullName}</p>
