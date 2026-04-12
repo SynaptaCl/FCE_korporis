@@ -42,7 +42,7 @@ export interface Habits {
 
 export interface Anamnesis {
   id: string;
-  patient_id: string;
+  id_paciente: string;
   motivo_consulta: string;
   antecedentes_medicos: MedicalHistory[];
   antecedentes_quirurgicos: SurgicalHistory[];
@@ -57,8 +57,8 @@ export interface Anamnesis {
 
 export interface VitalSigns {
   id: string;
-  patient_id: string;
-  encounter_id: string;
+  id_paciente: string;
+  id_encuentro: string | null;
   presion_arterial: string;
   frecuencia_cardiaca: number;
   spo2: number;

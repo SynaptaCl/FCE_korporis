@@ -3,7 +3,7 @@ import type { Especialidad, Rol } from "@/lib/constants";
 export interface Practitioner {
   id: string;
   rut: string;
-  nombres: string;
+  nombre: string;
   apellidos: string;
   especialidad: Especialidad;
   rol: Rol;

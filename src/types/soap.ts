@@ -8,8 +8,8 @@ export interface Intervention {
 
 export interface SoapNote {
   id: string;
-  encounter_id: string;
-  patient_id: string;
+  id_encuentro: string;
+  id_paciente: string;
   subjetivo: string;
   objetivo: string;
   analisis_cif: CifAssessment;

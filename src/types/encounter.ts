@@ -5,8 +5,8 @@ export type Modalidad = "presencial" | "domicilio" | "virtual";
 
 export interface Encounter {
   id: string;
-  patient_id: string;
-  practitioner_id: string;
+  id_paciente: string;
+  id_profesional: string;
   especialidad: Especialidad;
   modalidad: Modalidad;
   status: EncounterStatus;
