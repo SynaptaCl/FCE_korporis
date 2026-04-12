@@ -8,3 +8,6 @@ export { FonoaudiologiaEval } from "./FonoaudiologiaEval";
 export { MasoterapiaEval } from "./MasoterapiaEval";
 export { SoapForm } from "./SoapForm";
 export { CifMapper } from "./CifMapper";
+export { PatientActionNav } from "./PatientActionNav";
+export { ClinicalTimeline } from "./ClinicalTimeline";
+export { SummaryPanel } from "./SummaryPanel";

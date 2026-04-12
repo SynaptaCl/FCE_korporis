@@ -127,11 +127,12 @@ export interface MasoPostCirugiaData {
 
 export interface Evaluation {
   id: string;
-  encounter_id: string;
-  patient_id: string;
+  id_encuentro: string | null;
+  id_paciente: string;
   especialidad: Especialidad;
   sub_area: string;
   data: Record<string, unknown>;
+  contraindicaciones_certificadas: boolean | null;
   created_by: string;
   created_at: string;
 }
