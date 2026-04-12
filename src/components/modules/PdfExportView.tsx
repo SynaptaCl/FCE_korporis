@@ -8,6 +8,7 @@ import { calculateAge } from "@/lib/utils";
 
 interface PdfExportViewProps {
   data: PdfPatientData;
+  generatedAt: string;
 }
 
 const RED_FLAG_LABELS: Record<string, string> = {
@@ -30,7 +31,7 @@ function formatDate(iso: string | null | undefined): string {
   }
 }
 
-export function PdfExportView({ data }: PdfExportViewProps) {
+export function PdfExportView({ data, generatedAt }: PdfExportViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<"idle" | "generating" | "done" | "error">("idle");
 
@@ -73,9 +74,6 @@ export function PdfExportView({ data }: PdfExportViewProps) {
         .map(([k]) => RED_FLAG_LABELS[k] ?? k)
     : [];
 
-  const generatedAt = format(new Date(), "dd 'de' MMMM 'de' yyyy 'a las' HH:mm", {
-    locale: es,
-  });
 
   async function generatePdf() {
     if (!containerRef.current) return;

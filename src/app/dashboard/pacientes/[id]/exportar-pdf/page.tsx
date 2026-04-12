@@ -24,6 +24,8 @@ export default async function ExportarPdfPage({
   const result = await getPdfPatientData(id);
   if (!result.success) notFound();
 
+  const generatedAt = new Date().toLocaleString("es-CL", { timeZone: "America/Santiago" });
+
   const patient = result.data.patient;
   const fullName =
     [patient.nombre, patient.apellido_paterno, patient.apellido_materno]
@@ -42,7 +44,7 @@ export default async function ExportarPdfPage({
           Volver a ficha de {fullName}
         </Link>
       </div>
-      <PdfExportView data={result.data} />
+      <PdfExportView data={result.data} generatedAt={generatedAt} />
     </div>
   );
 }
