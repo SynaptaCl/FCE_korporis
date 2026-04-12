@@ -104,7 +104,7 @@ export function SoapForm({ patientId, initialNote, objetivoHint }: SoapFormProps
   const [saved, setSaved] = useState(false);
   const [signed, setSigned] = useState(initialNote?.firmado ?? false);
   const [signedAt, setSignedAt] = useState(initialNote?.firmado_at);
-  const [signedBy, setSignedBy] = useState(initialNote?.firmado_por);
+  const signedBy = initialNote?.firmado_por;
   const [signError, setSignError] = useState<string | null>(null);
   const [isSigning, setIsSigning] = useState(false);
 
