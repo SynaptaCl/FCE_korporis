@@ -337,7 +337,7 @@ export function ConsentManager({ patientId, consentimientos }: ConsentManagerPro
           {consentimientos.length === 0 ? (
             <div className="text-center py-10 text-ink-3">
               <FileSignature className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p className="text-sm">No hay consentimientos registrados.</p>
+              <p className="text-sm">No hay consentimientos firmados.</p>
               <p className="text-xs mt-1">Crea uno con el botón &quot;Nuevo consentimiento&quot;.</p>
             </div>
           ) : (

@@ -461,7 +461,7 @@ export function ClinicalTimeline({
             <FileText className="w-8 h-8 text-ink-4 mb-2" />
             <p className="text-sm font-medium text-ink-3">
               {activeTab === "todos"
-                ? "Sin registros clínicos aún"
+                ? "Sin actividad clínica registrada"
                 : "Sin registros para este filtro"}
             </p>
             <p className="text-xs text-ink-4 mt-1">

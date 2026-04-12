@@ -141,19 +141,23 @@ export default async function EvolucionPage({
       </Card>
 
       {/* Historial de notas firmadas */}
-      {signedNotes.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-ink-3 uppercase tracking-widest flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
-            Historial — {signedNotes.length} nota{signedNotes.length !== 1 ? "s" : ""} firmada{signedNotes.length !== 1 ? "s" : ""}
-          </h4>
+      <div className="space-y-2">
+        <h4 className="text-xs font-semibold text-ink-3 uppercase tracking-widest flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5" />
+          {signedNotes.length > 0
+            ? `Historial — ${signedNotes.length} nota${signedNotes.length !== 1 ? "s" : ""} firmada${signedNotes.length !== 1 ? "s" : ""}`
+            : "Historial"}
+        </h4>
+        {signedNotes.length > 0 ? (
           <div className="space-y-2">
             {signedNotes.map((note) => (
               <SignedNoteSummary key={note.id} note={note} patientId={id} />
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-xs text-ink-4 italic py-2">No hay notas de evolución firmadas aún.</p>
+        )}
+      </div>
 
       {/* Borradores adicionales */}
       {draftNotes.length > 1 && (
