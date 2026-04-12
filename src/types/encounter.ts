@@ -31,6 +31,6 @@ export interface CitaAgenda {
   color_agenda: string | null;
   notas_cita: string | null;
   id_encuentro: string | null;
-  encuentro_status: string | null;
+  encuentro_status: EncounterStatus | null;
   id_clinica: string;
 }
