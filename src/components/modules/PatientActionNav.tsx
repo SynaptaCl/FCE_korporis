@@ -94,7 +94,7 @@ function NavLink({
     <Link
       href={item.href}
       className={cn(
-        "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors group",
+        "flex items-center gap-2.5 px-3 py-2 min-h-[44px] rounded-lg text-sm transition-colors group",
         isActive
           ? "bg-kp-accent-xs text-kp-primary font-medium border border-kp-accent/30"
           : "text-ink-2 hover:bg-surface-0 hover:text-ink-1"
@@ -135,7 +135,7 @@ export function PatientActionNav({
         </p>
         <Link
           href={`/dashboard/pacientes/${patientId}/evolucion?nueva=1`}
-          className="flex items-center gap-1 text-[0.65rem] font-semibold text-kp-accent hover:text-kp-primary transition-colors"
+          className="flex items-center gap-1 min-h-[44px] px-2 text-[0.65rem] font-semibold text-kp-accent hover:text-kp-primary transition-colors"
           title="Nueva nota SOAP"
         >
           <Plus className="w-3 h-3" />

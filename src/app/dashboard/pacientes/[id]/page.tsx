@@ -19,8 +19,10 @@ export async function generateMetadata({
   const result = await getPatientById(id);
   if (!result.success) return { title: "Paciente" };
   const p = result.data;
-  const fullName = [p.nombre, p.apellido_paterno].filter(Boolean).join(" ");
-  return { title: `Ficha — ${fullName}` };
+  const fullName = [p.nombre, p.apellido_paterno, p.apellido_materno]
+    .filter(Boolean)
+    .join(" ");
+  return { title: fullName || "Paciente" };
 }
 
 export default async function PatientDetailPage({
@@ -116,8 +118,8 @@ export default async function PatientDetailPage({
           <ClinicalTimeline entries={entries} currentUserId={user.id} />
         </div>
 
-        {/* ── Columna 3: Panel resumen (solo xl) ── */}
-        <div className="hidden xl:block xl:sticky xl:top-4 self-start">
+        {/* ── Columna 3: Panel resumen (mobile+md: bajo timeline; lg: oculto; xl: col 3) ── */}
+        <div className="lg:hidden xl:block xl:sticky xl:top-4 self-start">
           <SummaryPanel summary={summary} />
         </div>
 

@@ -3,7 +3,7 @@ import { formatDate } from "@/lib/utils";
 import { CLINIC_FULL_NAME } from "@/lib/constants";
 
 export const metadata = {
-  title: "Agenda Diaria",
+  title: "Dashboard",
 };
 
 export default function DashboardPage() {
