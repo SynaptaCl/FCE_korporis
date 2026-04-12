@@ -98,7 +98,7 @@ export default async function PatientDetailPage({
       </div>
 
       {/* PatientHeader — banner M1 */}
-      <PatientHeader patient={p} hasConsent={hasConsent} />
+      <PatientHeader patient={p} hasConsent={hasConsent} patientId={id} />
 
       {/*
         Grid 3 columnas:
@@ -120,7 +120,7 @@ export default async function PatientDetailPage({
 
         {/* ── Columna 3: Panel resumen (mobile+md: bajo timeline; lg: oculto; xl: col 3) ── */}
         <div className="lg:hidden xl:block xl:sticky xl:top-4 self-start">
-          <SummaryPanel summary={summary} />
+          <SummaryPanel summary={summary} patientId={id} />
         </div>
 
       </div>

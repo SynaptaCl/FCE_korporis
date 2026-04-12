@@ -11,6 +11,7 @@ import {
   Plus,
   FileDown,
   Share2,
+  Pencil,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -163,6 +164,18 @@ export function PatientActionNav({
 
       {/* Nav entries */}
       <div className="p-2 space-y-1">
+        {/* Editar datos — siempre primero */}
+        <NavLink
+          item={{
+            id: "editar",
+            label: "Editar datos",
+            icon: <Pencil className="w-4 h-4" />,
+            href: `/dashboard/pacientes/${patientId}/editar`,
+          }}
+          isActive={isActiveHref(`/dashboard/pacientes/${patientId}/editar`)}
+        />
+        <div className="my-1 border-t border-kp-border" />
+
         {entries.map((entry, idx) => {
           if ("title" in entry) {
             return (

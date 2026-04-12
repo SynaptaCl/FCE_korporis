@@ -1,4 +1,5 @@
-import { FileSignature } from "lucide-react";
+import Link from "next/link";
+import { FileSignature, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { calculateAge, formatRut } from "@/lib/utils";
 import type { Patient } from "@/types";
@@ -6,9 +7,10 @@ import type { Patient } from "@/types";
 interface PatientHeaderProps {
   patient: Patient;
   hasConsent: boolean;
+  patientId?: string;
 }
 
-export function PatientHeader({ patient, hasConsent }: PatientHeaderProps) {
+export function PatientHeader({ patient, hasConsent, patientId }: PatientHeaderProps) {
   const initials = `${patient.nombre?.charAt(0) ?? ""}${patient.apellido_paterno?.charAt(0) ?? ""}`.toUpperCase() || "?";
   const age = calculateAge(patient.fecha_nacimiento);
   const fullName =
@@ -84,6 +86,18 @@ export function PatientHeader({ patient, hasConsent }: PatientHeaderProps) {
           )}
         </div>
       </div>
+
+      {/* Editar paciente */}
+      {patientId && (
+        <Link
+          href={`/dashboard/pacientes/${patientId}/editar`}
+          className="flex items-center gap-1.5 shrink-0 px-3 py-2 text-xs font-semibold text-kp-accent border border-kp-accent/30 rounded-lg hover:bg-kp-accent-xs transition-colors"
+          title="Editar datos del paciente"
+        >
+          <Pencil className="w-3.5 h-3.5" />
+          Editar paciente
+        </Link>
+      )}
     </div>
   );
 }

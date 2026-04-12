@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   AlertTriangle,
   Activity,
@@ -5,6 +6,7 @@ import {
   Target,
   Clock,
   Calendar,
+  Pencil,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
@@ -12,6 +14,7 @@ import type { PatientSummary } from "@/app/actions/timeline";
 
 interface SummaryPanelProps {
   summary: PatientSummary;
+  patientId: string;
 }
 
 // ── Section wrapper ────────────────────────────────────────────────────────
@@ -21,19 +24,30 @@ function PanelSection({
   icon,
   children,
   className,
+  editHref,
 }: {
   title: string;
   icon: React.ReactNode;
   children: React.ReactNode;
   className?: string;
+  editHref?: string;
 }) {
   return (
     <div className={cn("space-y-1.5", className)}>
       <div className="flex items-center gap-1.5">
         <span className="text-kp-accent">{icon}</span>
-        <p className="text-[0.6rem] font-bold text-ink-3 uppercase tracking-wider">
+        <p className="text-[0.6rem] font-bold text-ink-3 uppercase tracking-wider flex-1">
           {title}
         </p>
+        {editHref && (
+          <Link
+            href={editHref}
+            className="text-ink-4 hover:text-kp-accent transition-colors"
+            title={`Ir a ${title}`}
+          >
+            <Pencil className="w-3 h-3" />
+          </Link>
+        )}
       </div>
       {children}
     </div>
@@ -42,8 +56,9 @@ function PanelSection({
 
 // ── SummaryPanel ───────────────────────────────────────────────────────────
 
-export function SummaryPanel({ summary }: SummaryPanelProps) {
+export function SummaryPanel({ summary, patientId }: SummaryPanelProps) {
   const hasRedFlags = summary.red_flags_activos.length > 0;
+  const base = `/dashboard/pacientes/${patientId}`;
 
   return (
     <div className="bg-surface-1 rounded-xl border border-kp-border overflow-hidden">
@@ -60,6 +75,7 @@ export function SummaryPanel({ summary }: SummaryPanelProps) {
           <PanelSection
             title="Alertas Activas"
             icon={<AlertTriangle className="w-3.5 h-3.5" />}
+            editHref={`${base}/anamnesis`}
           >
             <div className="bg-kp-danger-lt rounded-lg p-2.5 space-y-1.5">
               {summary.red_flags_activos.map((flag) => (
@@ -80,6 +96,7 @@ export function SummaryPanel({ summary }: SummaryPanelProps) {
           title="Motivo de Consulta"
           icon={<ClipboardList className="w-3.5 h-3.5" />}
           className={hasRedFlags ? "pt-4" : ""}
+          editHref={`${base}/anamnesis`}
         >
           {summary.motivo_consulta ? (
             <p className="text-xs text-ink-2 leading-relaxed line-clamp-5">
@@ -108,6 +125,7 @@ export function SummaryPanel({ summary }: SummaryPanelProps) {
           title="Últimos Signos Vitales"
           icon={<Activity className="w-3.5 h-3.5" />}
           className="pt-4"
+          editHref={`${base}/anamnesis`}
         >
           {summary.vitales ? (
             <div className="grid grid-cols-2 gap-1.5">
@@ -147,6 +165,7 @@ export function SummaryPanel({ summary }: SummaryPanelProps) {
           title="Plan Actual"
           icon={<ClipboardList className="w-3.5 h-3.5" />}
           className="pt-4"
+          editHref={`${base}/evolucion`}
         >
           {summary.plan_actual ? (
             <p className="text-xs text-ink-2 leading-relaxed line-clamp-6">
