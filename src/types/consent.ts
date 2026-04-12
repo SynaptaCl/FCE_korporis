@@ -6,19 +6,22 @@ export interface SignatureData {
 }
 
 export interface ProfessionalSignature {
-  practitioner_id: string;
+  id_profesional: string;
   timestamp: string;
   hash: string;
 }
 
 export interface Consent {
   id: string;
-  patient_id: string;
+  id_paciente: string;
+  id_clinica?: string | null;
   tipo: ConsentType;
   version: number;
   contenido: string;
   firma_paciente?: SignatureData;
   firma_profesional?: ProfessionalSignature;
   firmado: boolean;
+  firmado_at?: string | null;
+  created_by: string;
   created_at: string;
 }

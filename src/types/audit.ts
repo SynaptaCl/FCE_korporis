@@ -7,23 +7,21 @@ export type AuditAction =
   | "sign"
   | "export";
 
-export type AuditResourceType =
-  | "patient"
-  | "anamnesis"
-  | "encounter"
-  | "evaluation"
-  | "soap_note"
-  | "consent"
-  | "vital_signs";
+export type AuditActorTipo = "profesional" | "admin" | "sistema";
 
 export interface AuditEntry {
   id: number;
-  user_id: string;
-  action: AuditAction;
-  resource_type?: AuditResourceType;
-  resource_id?: string;
-  details?: Record<string, unknown>;
+  id_clinica?: string;
+  id_paciente?: string | null;
+  actor_id: string;
+  actor_tipo: AuditActorTipo;
+  accion: AuditAction;
+  tabla_afectada?: string;
+  registro_id?: string;
+  datos_antes?: Record<string, unknown>;
+  datos_despues?: Record<string, unknown>;
   ip_address?: string;
   user_agent?: string;
+  canal?: string;
   created_at: string;
 }
