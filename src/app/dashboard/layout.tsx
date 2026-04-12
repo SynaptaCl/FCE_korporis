@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { BrandingInjector, type BrandingConfig } from "@/components/layout/BrandingInjector";
 import type { Especialidad, Rol } from "@/lib/constants";
 
 export default async function DashboardLayout({
@@ -20,37 +21,55 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // Obtener datos del profesional desde la tabla `profesionales`
-  const { data: profesional } = await supabase
-    .from("profesionales")
-    .select("nombre, apellidos, especialidad, rol")
-    .eq("id", user.id)
-    .single();
+  // Fetch profesional + admin_user en paralelo
+  const [profesionalRes, adminRes] = await Promise.all([
+    supabase
+      .from("profesionales")
+      .select("nombre, apellidos, especialidad, rol")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("admin_users")
+      .select("id_clinica")
+      .eq("auth_id", user.id)
+      .maybeSingle(),
+  ]);
 
-  // Fallback si aún no tiene registro en profesionales
-  const nombre = profesional?.nombre ?? user.email?.split("@")[0] ?? "Usuario";
+  const profesional = profesionalRes.data;
+  const idClinica = adminRes.data?.id_clinica ?? null;
+
+  // Fetch branding si hay clínica asociada
+  let branding: BrandingConfig | null = null;
+  if (idClinica) {
+    const { data: clinica } = await supabase
+      .from("clinicas")
+      .select("config")
+      .eq("id", idClinica)
+      .single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    branding = (clinica?.config as any)?.branding ?? null;
+  }
+
+  const nombre    = profesional?.nombre   ?? user.email?.split("@")[0] ?? "Usuario";
   const apellidos = profesional?.apellidos ?? "";
   const especialidad = (profesional?.especialidad as Especialidad) ?? "kinesiologia";
-  const rol = (profesional?.rol as Rol) ?? "profesional";
+  const rol          = (profesional?.rol          as Rol)          ?? "profesional";
 
-  const practitionerName = apellidos
-    ? `${nombre} ${apellidos}`
-    : nombre;
-
-  // Iniciales: primera letra de nombre + primera letra de apellidos
-  const initials = [nombre[0], apellidos[0]]
-    .filter(Boolean)
-    .join("")
-    .toUpperCase() || "U";
+  const practitionerName = apellidos ? `${nombre} ${apellidos}` : nombre;
+  const initials = [nombre[0], apellidos[0]].filter(Boolean).join("").toUpperCase() || "U";
 
   return (
-    <DashboardShell
-      practitionerName={practitionerName}
-      practitionerInitials={initials}
-      especialidad={especialidad}
-      rol={rol}
-    >
-      {children}
-    </DashboardShell>
+    <>
+      <BrandingInjector branding={branding} />
+      <DashboardShell
+        practitionerName={practitionerName}
+        practitionerInitials={initials}
+        especialidad={especialidad}
+        rol={rol}
+        branding={branding}
+      >
+        {children}
+      </DashboardShell>
+    </>
   );
 }

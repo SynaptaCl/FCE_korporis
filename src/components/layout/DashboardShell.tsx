@@ -6,6 +6,7 @@ import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { createClient } from "@/lib/supabase/client";
 import type { Especialidad, Rol } from "@/lib/constants";
+import type { BrandingConfig } from "./BrandingInjector";
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -13,23 +14,25 @@ interface DashboardShellProps {
   practitionerInitials: string;
   especialidad: Especialidad;
   rol: Rol;
+  branding: BrandingConfig | null;
 }
 
 const SECTION_TITLES: Record<string, string> = {
-  agenda: "Agenda Diaria",
+  agenda:    "Agenda Diaria",
   pacientes: "Pacientes",
-  ficha: "Ficha Clínica",
-  fhir: "Interoperabilidad",
-  config: "Configuración",
+  ficha:     "Ficha Clínica",
+  fhir:      "Interoperabilidad FHIR",
+  config:    "Configuración",
 };
 
 const PATH_TO_SECTION: Array<[string, string]> = [
   ["/dashboard/configuracion", "config"],
-  ["/dashboard/pacientes", "pacientes"],
-  ["/dashboard", "agenda"],
+  ["/dashboard/pacientes",     "pacientes"],
+  ["/dashboard",               "agenda"],
 ];
 
 function getSectionFromPath(pathname: string): string {
+  if (pathname.includes("/fhir")) return "fhir";
   for (const [prefix, section] of PATH_TO_SECTION) {
     if (pathname.startsWith(prefix)) return section;
   }
@@ -37,10 +40,10 @@ function getSectionFromPath(pathname: string): string {
 }
 
 const SECTION_TO_PATH: Record<string, string> = {
-  agenda: "/dashboard",
+  agenda:    "/dashboard",
   pacientes: "/dashboard/pacientes",
-  config: "/dashboard/configuracion",
-  // fhir y ficha no tienen ruta propia aún
+  config:    "/dashboard/configuracion",
+  fhir:      "/dashboard/pacientes", // FHIR es por paciente; va a la lista
 };
 
 export function DashboardShell({
@@ -49,6 +52,7 @@ export function DashboardShell({
   practitionerInitials,
   especialidad,
   rol,
+  branding,
 }: DashboardShellProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -78,6 +82,7 @@ export function DashboardShell({
         activeSection={activeSection}
         onNavigate={handleNavigate}
         onLogout={handleLogout}
+        branding={branding}
       />
 
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">

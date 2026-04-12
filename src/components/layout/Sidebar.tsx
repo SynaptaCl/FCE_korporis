@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { ESPECIALIDAD_LABELS } from "@/lib/constants";
 import type { Especialidad, Rol } from "@/lib/constants";
+import type { BrandingConfig } from "./BrandingInjector";
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -51,6 +52,7 @@ interface SidebarProps {
   activeSection: string;
   onNavigate: (section: string) => void;
   onLogout: () => void;
+  branding: BrandingConfig | null;
 }
 
 export function Sidebar({
@@ -61,8 +63,12 @@ export function Sidebar({
   activeSection,
   onNavigate,
   onLogout,
+  branding,
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+
+  const clinicName = branding?.clinic_short_name ?? "FCE";
+  const logoUrl    = branding?.logo_url ?? null;
 
   return (
     <aside
@@ -73,17 +79,28 @@ export function Sidebar({
     >
       {/* Logo */}
       <div className="h-16 flex items-center px-4 border-b border-white/10 justify-between">
-        <div className="flex items-center">
-          <Activity className="text-kp-accent w-6 h-6 shrink-0" />
+        <div className="flex items-center min-w-0">
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoUrl}
+              alt={`${clinicName} logo`}
+              width={28}
+              height={28}
+              className="shrink-0 object-contain"
+            />
+          ) : (
+            <Activity className="text-kp-accent w-6 h-6 shrink-0" />
+          )}
           {!collapsed && (
-            <span className="text-white font-bold tracking-wider ml-3 text-sm">
-              KORPORIS FCE
+            <span className="text-white font-bold tracking-wider ml-3 text-sm truncate">
+              {clinicName} FCE
             </span>
           )}
         </div>
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="text-ink-3 hover:text-white transition-colors cursor-pointer"
+          className="text-ink-3 hover:text-white transition-colors cursor-pointer shrink-0 ml-1"
         >
           <ChevronLeft
             className={cn("w-4 h-4 transition-transform", collapsed && "rotate-180")}
@@ -134,7 +151,7 @@ export function Sidebar({
         />
         <NavItem
           icon={<Share2 />}
-          text="Interoperabilidad"
+          text="Interoperabilidad (FHIR)"
           active={activeSection === "fhir"}
           collapsed={collapsed}
           onClick={() => onNavigate("fhir")}

@@ -9,6 +9,8 @@ import {
   FileSignature,
   ShieldCheck,
   Plus,
+  FileDown,
+  Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -80,6 +82,22 @@ function buildNav(patientId: string): NavEntry[] {
         adminOnly: true,
       },
     },
+    {
+      item: {
+        id: "exportar-pdf",
+        label: "Exportar PDF",
+        icon: <FileDown className="w-4 h-4" />,
+        href: `${base}/exportar-pdf`,
+      },
+    },
+    {
+      item: {
+        id: "fhir",
+        label: "FHIR Preview",
+        icon: <Share2 className="w-4 h-4" />,
+        href: `${base}/fhir`,
+      },
+    },
   ];
 }
 
@@ -147,7 +165,6 @@ export function PatientActionNav({
       <div className="p-2 space-y-1">
         {entries.map((entry, idx) => {
           if ("title" in entry) {
-            // Grupo con sección
             return (
               <div key={entry.title}>
                 {idx > 0 && <div className="my-1 border-t border-kp-border" />}
@@ -166,7 +183,6 @@ export function PatientActionNav({
               </div>
             );
           }
-          // Item standalone
           const { item } = entry;
           if (item.adminOnly && !isAdmin) return null;
           return (
