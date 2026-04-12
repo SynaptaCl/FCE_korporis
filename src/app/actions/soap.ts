@@ -32,30 +32,46 @@ async function logAudit(supabase: any, userId: string, accion: string, tablaAfec
 }
 
 // ── getOrCreateEncounter ────────────────────────────────────────────────────
-// Busca un encuentro abierto para hoy; si no existe, crea uno nuevo.
+// 1. Busca un encuentro pre-creado por check-in (planificado, con id_cita, de hoy)
+// 2. Si lo encuentra → transiciona a en_progreso y retorna su id
+// 3. Si no → crea un walk-in nuevo (sin id_cita)
 
 async function getOrCreateEncounter(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   patientId: string,
   userId: string,
+  idClinica: string | null,
   especialidad: string,
 ): Promise<string> {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
+  const tomorrowStart = new Date(todayStart);
+  tomorrowStart.setDate(tomorrowStart.getDate() + 1);
 
-  const { data: existing } = await supabase
-    .from("fce_encuentros")
-    .select("id")
-    .eq("id_paciente", patientId)
-    .eq("id_profesional", userId)
-    .eq("status", "en_progreso")
-    .gte("created_at", todayStart.toISOString())
-    .maybeSingle();
+  // 1. Buscar encuentro pre-creado por check-in de hoy
+  if (idClinica) {
+    const { data: preplanned } = await supabase
+      .from("fce_encuentros")
+      .select("id")
+      .eq("id_paciente", patientId)
+      .eq("id_clinica", idClinica)
+      .eq("status", "planificado")
+      .not("id_cita", "is", null)
+      .gte("started_at", todayStart.toISOString())
+      .lt("started_at", tomorrowStart.toISOString())
+      .maybeSingle();
 
-  if (existing?.id) return existing.id as string;
+    if (preplanned?.id) {
+      await supabase
+        .from("fce_encuentros")
+        .update({ status: "en_progreso", started_at: new Date().toISOString() })
+        .eq("id", preplanned.id);
+      return preplanned.id as string;
+    }
+  }
 
-  const idClinica = await getIdClinica(supabase, userId);
+  // 2. Fallback: crear walk-in (atención sin agenda)
   const { data: created, error } = await supabase
     .from("fce_encuentros")
     .insert({
@@ -136,10 +152,11 @@ export async function upsertSoapNote(
     id = noteId;
     await logAudit(supabase, user.id, "update", "soap_note", id, patientId);
   } else {
-    // CREATE — auto-crear encuentro
+    // CREATE — buscar encuentro pre-creado o crear walk-in
+    const idClinica = await getIdClinica(supabase, user.id);
     let encounterId: string;
     try {
-      encounterId = await getOrCreateEncounter(supabase, patientId, user.id, especialidad);
+      encounterId = await getOrCreateEncounter(supabase, patientId, user.id, idClinica, especialidad);
     } catch (e) {
       return { success: false, error: (e as Error).message };
     }
@@ -187,12 +204,20 @@ export async function signSoapNote(
 
   if (error) return { success: false, error: error.message };
 
-  // Cerrar el encuentro asociado
-  await supabase
-    .from("fce_encuentros")
-    .update({ status: "finalizado", ended_at: new Date().toISOString() })
-    .eq("id_paciente", patientId)
-    .eq("status", "en_progreso");
+  // Cerrar el encuentro específico vinculado al SOAP note
+  const { data: notaConEncuentro } = await supabase
+    .from("fce_notas_soap")
+    .select("id_encuentro")
+    .eq("id", noteId)
+    .single();
+
+  if (notaConEncuentro?.id_encuentro) {
+    await supabase
+      .from("fce_encuentros")
+      .update({ status: "finalizado", ended_at: new Date().toISOString() })
+      .eq("id", notaConEncuentro.id_encuentro)
+      .eq("status", "en_progreso");
+  }
 
   await logAudit(supabase, user.id, "sign", "soap_note", noteId, patientId);
 
