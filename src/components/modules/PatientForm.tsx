@@ -309,7 +309,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
         <Input
           label="Comuna"
           required
-          placeholder="San Joaquín"
+          placeholder="Ej: San Joaquín"
           error={errors.direccion?.comuna?.message}
           {...register("direccion.comuna")}
         />
@@ -317,7 +317,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
         <Input
           label="Calle"
           required
-          placeholder="Juan Sebastián Bach"
+          placeholder="Ej: Av. Las Industrias"
           error={errors.direccion?.calle?.message}
           {...register("direccion.calle")}
         />
@@ -325,7 +325,7 @@ export function PatientForm({ mode, patientId, initialData }: PatientFormProps) 
         <Input
           label="Número"
           required
-          placeholder="208"
+          placeholder="Ej: 1120"
           error={errors.direccion?.numero?.message}
           {...register("direccion.numero")}
         />

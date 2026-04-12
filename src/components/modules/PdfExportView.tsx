@@ -56,7 +56,15 @@ export function PdfExportView({ data }: PdfExportViewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dir = patient.direccion as any;
   const direccionStr = dir
-    ? [dir.calle, dir.numero, dir.comuna, dir.region].filter(Boolean).join(", ")
+    ? [
+        dir.calle
+          ? `${dir.calle}${dir.numero && !dir.calle.includes(dir.numero) ? " " + dir.numero : ""}`
+          : null,
+        dir.comuna && dir.comuna !== dir.calle ? dir.comuna : null,
+        dir.region ?? null,
+      ]
+        .filter(Boolean)
+        .join(", ") || "—"
     : "—";
 
   const activeRedFlags = anamnesis?.red_flags

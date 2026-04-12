@@ -6,8 +6,6 @@ import {
   Activity,
   Calendar,
   User,
-  FileText,
-  Share2,
   Settings,
   ShieldCheck,
   LogOut,
@@ -67,7 +65,7 @@ export function Sidebar({
 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
 
-  const clinicName = branding?.clinic_short_name ?? "FCE";
+  const clinicName = branding?.clinic_short_name ?? "KORPORIS FCE";
   const logoUrl    = branding?.logo_url ?? null;
 
   return (
@@ -94,7 +92,7 @@ export function Sidebar({
           )}
           {!collapsed && (
             <span className="text-white font-bold tracking-wider ml-3 text-sm truncate">
-              {clinicName} FCE
+              {clinicName}
             </span>
           )}
         </div>
@@ -120,7 +118,9 @@ export function Sidebar({
             </div>
             <div className="ml-3 min-w-0">
               <div className="text-sm font-bold text-white truncate">{practitionerName}</div>
-              <div className="text-xs text-kp-accent">{ESPECIALIDAD_LABELS[especialidad]}</div>
+              <div className="text-xs text-kp-accent">
+                {rol === "admin" ? "Administración Clínica" : ESPECIALIDAD_LABELS[especialidad]}
+              </div>
             </div>
           </div>
         </div>
@@ -141,20 +141,6 @@ export function Sidebar({
           active={activeSection === "pacientes"}
           collapsed={collapsed}
           onClick={() => onNavigate("pacientes")}
-        />
-        <NavItem
-          icon={<FileText />}
-          text="Ficha Clínica"
-          active={activeSection === "ficha"}
-          collapsed={collapsed}
-          onClick={() => onNavigate("ficha")}
-        />
-        <NavItem
-          icon={<Share2 />}
-          text="Interoperabilidad (FHIR)"
-          active={activeSection === "fhir"}
-          collapsed={collapsed}
-          onClick={() => onNavigate("fhir")}
         />
         {rol === "admin" && (
           <NavItem

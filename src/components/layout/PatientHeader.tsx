@@ -22,6 +22,20 @@ export function PatientHeader({ patient, hasConsent }: PatientHeaderProps) {
         ? patient.prevision.isapre || "Isapre"
         : "Particular";
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dir = patient.direccion as any;
+  const direccionStr = dir
+    ? [
+        dir.calle
+          ? `${dir.calle}${dir.numero && !dir.calle.includes(dir.numero) ? " " + dir.numero : ""}`
+          : null,
+        dir.comuna && dir.comuna !== dir.calle ? dir.comuna : null,
+        dir.region ?? null,
+      ]
+        .filter(Boolean)
+        .join(", ") || null
+    : null;
+
   return (
     <div className="bg-surface-1 rounded-xl border border-kp-border px-6 py-4 flex items-start gap-4">
       {/* Avatar */}
@@ -56,6 +70,12 @@ export function PatientHeader({ patient, hasConsent }: PatientHeaderProps) {
             <span className="font-medium text-ink-1">Ocupación:</span>{" "}
             {patient.ocupacion ?? "Sin registro"}
           </span>
+          {direccionStr && (
+            <span>
+              <span className="font-medium text-ink-1">Dirección:</span>{" "}
+              {direccionStr}
+            </span>
+          )}
         </div>
         <div className="flex gap-2 mt-1.5">
           <Badge variant="teal">Paciente activo</Badge>
