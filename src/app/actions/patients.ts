@@ -5,8 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { patientSchema, type PatientSchemaType } from "@/lib/validations";
 import { formatRut } from "@/lib/run-validator";
-import type { Patient, PacienteClinico } from "@/types";
-import type { CitaAgenda } from "@/types";
+import type { Patient, PacienteClinico, CitaAgenda } from "@/types";
 
 // ── Tipos de respuesta ─────────────────────────────────────────────────────
 
@@ -88,20 +87,21 @@ export async function getPatients(): Promise<ActionResult<PacienteClinico[]>> {
 export async function getAgendaDiaria(): Promise<ActionResult<CitaAgenda[]>> {
   const { supabase, user } = await requireAuth();
 
-  const idClinica = await getIdClinica(supabase, user.id);
+  // Resolver id_clinica y profesional en paralelo (son independientes)
+  const [idClinica, { data: prof }] = await Promise.all([
+    getIdClinica(supabase, user.id),
+    supabase
+      .from("profesionales")
+      .select("id, especialidad")
+      .eq("auth_id", user.id)
+      .maybeSingle(),
+  ]);
   if (!idClinica) return { success: false, error: "No se encontró la clínica asociada al usuario." };
 
-  const hoy = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+  // Fecha en zona horaria de Santiago (UTC-3/UTC-4) para evitar el desfase de medianoche
+  const hoy = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Santiago" }); // "YYYY-MM-DD"
 
-  // Resolver si el usuario autenticado es un profesional clínico
-  const { data: prof } = await supabase
-    .from("profesionales")
-    .select("id, especialidad")
-    .eq("auth_id", user.id)
-    .maybeSingle();
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let query: any = supabase
+  const baseQuery = supabase
     .from("vista_agenda_diaria")
     .select(
       "id_cita, estado, fecha, hora_inicio, hora_fin, id_paciente, " +
@@ -115,13 +115,9 @@ export async function getAgendaDiaria(): Promise<ActionResult<CitaAgenda[]>> {
     .order("hora_inicio");
 
   // Profesional clínico → solo su agenda; admin sin match → toda la clínica
-  if (prof) {
-    query = query.eq("id_profesional", prof.id);
-  }
-
-  const { data, error } = await query;
+  const { data, error } = await (prof ? baseQuery.eq("id_profesional", prof.id) : baseQuery);
   if (error) return { success: false, error: error.message };
-  return { success: true, data: (data ?? []) as CitaAgenda[] };
+  return { success: true, data: (data ?? []) as unknown as CitaAgenda[] };
 }
 
 // ── getPatientById ─────────────────────────────────────────────────────────
