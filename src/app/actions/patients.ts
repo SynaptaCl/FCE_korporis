@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { patientSchema, type PatientSchemaType } from "@/lib/validations";
 import { formatRut } from "@/lib/run-validator";
-import type { Patient } from "@/types";
+import type { Patient, PacienteClinico } from "@/types";
+import type { CitaAgenda } from "@/types";
 
 // ── Tipos de respuesta ─────────────────────────────────────────────────────
 
@@ -66,16 +67,61 @@ async function logAudit(
 
 // ── getPatients ────────────────────────────────────────────────────────────
 
-export async function getPatients(): Promise<ActionResult<Patient[]>> {
-  const { supabase } = await requireAuth();
+export async function getPatients(): Promise<ActionResult<PacienteClinico[]>> {
+  const { supabase, user } = await requireAuth();
+
+  const idClinica = await getIdClinica(supabase, user.id);
+  if (!idClinica) return { success: false, error: "No se encontró la clínica asociada al usuario." };
 
   const { data, error } = await supabase
-    .from("pacientes")
+    .from("vista_pacientes_clinicos")
     .select("*")
-    .order("apellido_paterno", { ascending: true });
+    .eq("id_clinica", idClinica)
+    .order("ultima_atencion", { ascending: false, nullsFirst: false });
 
   if (error) return { success: false, error: error.message };
-  return { success: true, data: data as Patient[] };
+  return { success: true, data: data as PacienteClinico[] };
+}
+
+// ── getAgendaDiaria ────────────────────────────────────────────────────────
+
+export async function getAgendaDiaria(): Promise<ActionResult<CitaAgenda[]>> {
+  const { supabase, user } = await requireAuth();
+
+  const idClinica = await getIdClinica(supabase, user.id);
+  if (!idClinica) return { success: false, error: "No se encontró la clínica asociada al usuario." };
+
+  const hoy = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+  // Resolver si el usuario autenticado es un profesional clínico
+  const { data: prof } = await supabase
+    .from("profesionales")
+    .select("id, especialidad")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query: any = supabase
+    .from("vista_agenda_diaria")
+    .select(
+      "id_cita, estado, fecha, hora_inicio, hora_fin, id_paciente, " +
+      "paciente_nombre, paciente_apellido, paciente_rut, " +
+      "id_profesional, profesional_nombre, profesional_especialidad, " +
+      "color_agenda, notas_cita, id_encuentro, encuentro_status, id_clinica"
+    )
+    .eq("id_clinica", idClinica)
+    .eq("fecha", hoy)
+    .in("estado", ["confirmada", "completada"])
+    .order("hora_inicio");
+
+  // Profesional clínico → solo su agenda; admin sin match → toda la clínica
+  if (prof) {
+    query = query.eq("id_profesional", prof.id);
+  }
+
+  const { data, error } = await query;
+  if (error) return { success: false, error: error.message };
+  return { success: true, data: (data ?? []) as CitaAgenda[] };
 }
 
 // ── getPatientById ─────────────────────────────────────────────────────────
