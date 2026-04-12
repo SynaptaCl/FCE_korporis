@@ -14,3 +14,23 @@ export interface Encounter {
   ended_at?: string;
   created_at: string;
 }
+
+export interface CitaAgenda {
+  id_cita: string;
+  estado: "confirmada" | "completada";
+  fecha: string;
+  hora_inicio: string;    // "HH:MM:SS"
+  hora_fin: string;       // "HH:MM:SS"
+  id_paciente: string;
+  paciente_nombre: string;
+  paciente_apellido: string;
+  paciente_rut: string | null;
+  id_profesional: string;
+  profesional_nombre: string;
+  profesional_especialidad: string | null;
+  color_agenda: string | null;
+  notas_cita: string | null;
+  id_encuentro: string | null;
+  encuentro_status: string | null;
+  id_clinica: string;
+}

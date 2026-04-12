@@ -38,3 +38,12 @@ export interface Patient {
 }
 
 export type PatientFormData = Omit<Patient, "id" | "created_at" | "updated_at">;
+
+export interface PacienteClinico extends Patient {
+  total_citas_confirmadas: number;
+  total_citas_completadas: number;
+  total_encuentros: number;
+  ultima_atencion: string | null;    // timestamptz → ISO string
+  proxima_cita_fecha: string | null; // date "YYYY-MM-DD"
+  proxima_cita_hora: string | null;  // time "HH:MM:SS"
+}
