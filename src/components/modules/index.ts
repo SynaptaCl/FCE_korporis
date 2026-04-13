@@ -11,3 +11,4 @@ export { CifMapper } from "./CifMapper";
 export { PatientActionNav } from "./PatientActionNav";
 export { ClinicalTimeline } from "./ClinicalTimeline";
 export { SummaryPanel } from "./SummaryPanel";
+export { AgendaTable } from "./AgendaTable";
