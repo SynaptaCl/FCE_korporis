@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { consentSchema, type ConsentSchemaType } from "@/lib/validations";
 import type { ActionResult } from "./patients";
-import { getIdClinica } from "./patients";
+import { getIdClinica, getProfesionalId } from "./patients";
 import type { Consent } from "@/types";
 
 async function requireAuth() {
@@ -51,7 +51,11 @@ export async function createConsentimiento(
     return { success: false, error: parsed.error.issues[0].message };
   }
   const { supabase, user } = await requireAuth();
-  const idClinica = await getIdClinica(supabase, user.id);
+  const [idClinica, profesionalId] = await Promise.all([
+    getIdClinica(supabase, user.id),
+    getProfesionalId(supabase, user.id),
+  ]);
+  if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
 
   // Versión: +1 sobre la más alta del mismo tipo
   const { data: existing } = await supabase
@@ -72,7 +76,7 @@ export async function createConsentimiento(
       tipo: parsed.data.tipo,
       contenido: parsed.data.contenido,
       version: nextVersion,
-      created_by: user.id,
+      created_by: profesionalId,
       ...(idClinica ? { id_clinica: idClinica } : {}),
     })
     .select("id")
@@ -93,6 +97,8 @@ export async function signConsentimiento(
     return { success: false, error: "Firma inválida" };
   }
   const { supabase, user } = await requireAuth();
+  const profesionalId = await getProfesionalId(supabase, user.id);
+  if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
   const timestamp = new Date().toISOString();
   const hash = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -100,7 +106,7 @@ export async function signConsentimiento(
     .from("fce_consentimientos")
     .update({
       firma_paciente: { data_url: firmaDataUrl, timestamp },
-      firma_profesional: { id_profesional: user.id, timestamp, hash },
+      firma_profesional: { id_profesional: profesionalId, timestamp, hash },
       firmado: true,
       firmado_at: timestamp,
     })
