@@ -26,8 +26,8 @@ export default async function DashboardLayout({
     supabase
       .from("profesionales")
       .select("nombre, apellidos, especialidad, rol")
-      .eq("id", user.id)
-      .single(),
+      .eq("auth_id", user.id)
+      .maybeSingle(),
     supabase
       .from("admin_users")
       .select("id_clinica")
