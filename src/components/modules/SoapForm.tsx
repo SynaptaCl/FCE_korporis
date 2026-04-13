@@ -92,11 +92,12 @@ interface SoapFormProps {
   patientId: string;
   initialNote?: SoapNote | null;
   objetivoHint?: string;
+  readOnly?: boolean;
 }
 
 // ── Componente principal ───────────────────────────────────────────────────
 
-export function SoapForm({ patientId, initialNote, objetivoHint }: SoapFormProps) {
+export function SoapForm({ patientId, initialNote, objetivoHint, readOnly: readOnlyProp = false }: SoapFormProps) {
   const [noteId, setNoteId] = useState<string | undefined>(
     initialNote?.id
   );
@@ -108,7 +109,7 @@ export function SoapForm({ patientId, initialNote, objetivoHint }: SoapFormProps
   const [signError, setSignError] = useState<string | null>(null);
   const [isSigning, setIsSigning] = useState(false);
 
-  const readOnly = signed;
+  const readOnly = readOnlyProp || signed;
 
   const {
     register,

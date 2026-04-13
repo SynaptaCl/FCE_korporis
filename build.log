@@ -1,0 +1,43 @@
+
+> korporis-fce@0.1.0 build
+> next build
+
+▲ Next.js 16.2.3 (Turbopack)
+- Environments: .env.local
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.4s
+  Running TypeScript ...
+  Finished TypeScript in 5.7s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/9) ...
+  Generating static pages using 15 workers (2/9) 
+  Generating static pages using 15 workers (4/9) 
+  Generating static pages using 15 workers (6/9) 
+✓ Generating static pages using 15 workers (9/9) in 374ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /dashboard
+├ ƒ /dashboard/pacientes
+├ ƒ /dashboard/pacientes/[id]
+├ ƒ /dashboard/pacientes/[id]/anamnesis
+├ ƒ /dashboard/pacientes/[id]/auditoria
+├ ƒ /dashboard/pacientes/[id]/consentimiento
+├ ƒ /dashboard/pacientes/[id]/editar
+├ ƒ /dashboard/pacientes/[id]/evaluacion
+├ ƒ /dashboard/pacientes/[id]/evolucion
+├ ƒ /dashboard/pacientes/[id]/exportar-pdf
+├ ƒ /dashboard/pacientes/[id]/fhir
+├ ƒ /dashboard/pacientes/nuevo
+├ ○ /icon.svg
+└ ○ /login
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
