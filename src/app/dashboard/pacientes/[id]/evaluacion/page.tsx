@@ -52,8 +52,8 @@ export default async function EvaluacionPage({
   const { data: profesional } = await supabase
     .from("profesionales")
     .select("especialidad")
-    .eq("id", user.id)
-    .single();
+    .eq("auth_id", user.id)
+    .maybeSingle();
 
   const rawEspecialidad = profesional?.especialidad ?? "kinesiologia";
   const isAdminUser = rawEspecialidad === "Administración Clínica";

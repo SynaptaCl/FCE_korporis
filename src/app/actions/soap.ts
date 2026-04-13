@@ -123,13 +123,15 @@ export async function upsertSoapNote(
 
   const { supabase, user } = await requireAuth();
 
-  // Obtener especialidad del profesional para el encuentro
+  // Obtener id y especialidad del profesional para el encuentro y FK
   const { data: prof } = await supabase
     .from("profesionales")
-    .select("especialidad")
-    .eq("id", user.id)
-    .single();
+    .select("id, especialidad")
+    .eq("auth_id", user.id)
+    .maybeSingle();
   const especialidad = (prof?.especialidad as string) ?? "kinesiologia";
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const profesionalId = prof?.id ?? null;
 
   let id: string;
 
