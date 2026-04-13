@@ -57,10 +57,11 @@ export default async function EvaluacionPage({
 
   const rawEspecialidad = profesional?.especialidad ?? "kinesiologia";
   const isAdminUser = rawEspecialidad === "Administración Clínica";
-  // Admin usa "kinesiologia" como tab por defecto; su acceso no está restringido por especialidad
-  const profEspecialidad = isAdminUser
+  // Normalizar a Especialidad type: la DB guarda "Kinesiología" (con tilde/mayúscula),
+  // el type espera "kinesiologia" (sin tilde, minúscula).
+  const profEspecialidad: Especialidad = isAdminUser
     ? "kinesiologia"
-    : (rawEspecialidad as Especialidad);
+    : (rawEspecialidad.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") as Especialidad);
 
   // Determinar tab activa (default: especialidad del profesional)
   const validEsp = ESPECIALIDAD_TABS.map((t) => t.key);

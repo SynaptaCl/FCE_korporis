@@ -129,7 +129,9 @@ export async function upsertSoapNote(
     .select("id, especialidad")
     .eq("auth_id", user.id)
     .maybeSingle();
-  const especialidad = (prof?.especialidad as string) ?? "kinesiologia";
+  // Normalizar a lowercase/sin-tilde para compatibilidad con el type Especialidad
+  const rawEsp = (prof?.especialidad as string) ?? "kinesiologia";
+  const especialidad = rawEsp.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const profesionalId = prof?.id ?? null;
 
   let id: string;
