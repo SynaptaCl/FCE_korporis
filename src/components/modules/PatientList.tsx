@@ -3,16 +3,18 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Search, UserPlus, ChevronRight, Users } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { calculateAge, formatRut, cn } from "@/lib/utils";
-import type { Patient } from "@/types";
+import type { PacienteClinico } from "@/types";
 
 interface PatientListProps {
-  patients: Patient[];
+  patients: PacienteClinico[];
 }
 
-function previsionLabel(p: Patient["prevision"] | null | undefined): string {
+function previsionLabel(p: PacienteClinico["prevision"] | null | undefined): string {
   if (!p) return "Sin previsión";
   if (p.tipo === "FONASA") return `FONASA ${p.tramo ?? ""}`.trim();
   if (p.tipo === "Isapre") return p.isapre ?? "Isapre";
@@ -23,6 +25,22 @@ function previsionVariant(tipo: "FONASA" | "Isapre" | "Particular" | null | unde
   if (tipo === "FONASA") return "info" as const;
   if (tipo === "Isapre") return "teal" as const;
   return "default" as const;
+}
+
+function atencionesMeta(p: PacienteClinico): string {
+  const ultima = p.ultima_atencion
+    ? `Última: ${format(new Date(p.ultima_atencion), "d MMM", { locale: es })}`
+    : null;
+  const proxima = p.proxima_cita_fecha
+    ? `Próxima: ${format(parseISO(p.proxima_cita_fecha), "d MMM", { locale: es })}${
+        p.proxima_cita_hora ? ` ${p.proxima_cita_hora.slice(0, 5)}` : ""
+      }`
+    : null;
+
+  if (!ultima && !proxima) return "Sin atenciones previas";
+  if (ultima && !proxima) return `${ultima} · Sin cita agendada`;
+  if (!ultima) return proxima ?? "Sin atenciones previas";
+  return `${ultima} · ${proxima}`;
 }
 
 export function PatientList({ patients }: PatientListProps) {
@@ -69,8 +87,8 @@ export function PatientList({ patients }: PatientListProps) {
       ) : (
         <div className="bg-surface-1 rounded-xl border border-kp-border overflow-hidden">
           {/* Header */}
-          <div className="hidden sm:grid grid-cols-[2fr_3fr_1fr_1.5fr_1fr_auto] gap-4 px-5 py-3 bg-surface-0 border-b border-kp-border">
-            {["RUN", "Nombre", "Edad", "Previsión", "Teléfono", ""].map(
+          <div className="hidden sm:grid grid-cols-[2fr_3fr_1fr_1.5fr_0.75fr_auto] gap-4 px-5 py-3 bg-surface-0 border-b border-kp-border">
+            {["RUN", "Nombre", "Edad", "Previsión", "Sesiones", ""].map(
               (h) => (
                 <span
                   key={h}
@@ -97,7 +115,7 @@ export function PatientList({ patients }: PatientListProps) {
                 className={cn(
                   "w-full text-left cursor-pointer transition-colors hover:bg-kp-accent-xs",
                   "px-5 py-3.5 border-b border-kp-border last:border-0",
-                  "flex flex-col sm:grid sm:grid-cols-[2fr_3fr_1fr_1.5fr_1fr_auto] sm:gap-4 sm:items-center",
+                  "flex flex-col sm:grid sm:grid-cols-[2fr_3fr_1fr_1.5fr_0.75fr_auto] sm:gap-4 sm:items-center",
                   idx % 2 === 0 ? "bg-surface-1" : "bg-surface-0/50"
                 )}
               >
@@ -106,21 +124,30 @@ export function PatientList({ patients }: PatientListProps) {
                   {run}
                 </span>
 
-                {/* Nombre */}
-                <span className="text-sm text-ink-1 font-medium truncate">
-                  {fullName}
-                </span>
+                {/* Nombre + meta de atenciones */}
+                <div className="min-w-0">
+                  <span className="text-sm text-ink-1 font-medium truncate block">
+                    {fullName}
+                  </span>
+                  <span className="text-xs text-ink-3 truncate block">
+                    {atencionesMeta(patient)}
+                  </span>
+                </div>
 
                 {/* Edad */}
-                <span className="text-sm text-ink-2">{age !== null ? `${age} años` : "Sin registro"}</span>
+                <span className="text-sm text-ink-2">
+                  {age !== null ? `${age} años` : "Sin registro"}
+                </span>
 
                 {/* Previsión */}
                 <Badge variant={previsionVariant(patient.prevision?.tipo)}>
                   {previsionLabel(patient.prevision)}
                 </Badge>
 
-                {/* Teléfono */}
-                <span className="text-sm text-ink-3">{patient.telefono}</span>
+                {/* Sesiones */}
+                <Badge variant={patient.total_encuentros > 0 ? "teal" : "default"}>
+                  {patient.total_encuentros}
+                </Badge>
 
                 {/* Acción */}
                 <ChevronRight className="w-4 h-4 text-ink-4 hidden sm:block" />
@@ -143,7 +170,7 @@ function EmptyState({ hasQuery }: { hasQuery: boolean }) {
     <div className="bg-surface-1 rounded-xl border border-kp-border px-6 py-16 text-center">
       <Users className="w-10 h-10 text-ink-4 mx-auto mb-3" />
       <p className="text-sm font-semibold text-ink-2">
-        {hasQuery ? "Sin resultados" : "Sin pacientes registrados"}
+        {hasQuery ? "Sin resultados" : "Aún no hay pacientes con atención clínica registrada."}
       </p>
       <p className="text-xs text-ink-3 mt-1">
         {hasQuery
