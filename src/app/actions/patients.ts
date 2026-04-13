@@ -37,6 +37,18 @@ export async function getIdClinica(supabase: any, userId: string): Promise<strin
   return (data?.id_clinica as string) ?? null;
 }
 
+// ── Helper: profesional id ─────────────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getProfesionalId(supabase: any, authId: string): Promise<string | null> {
+  const { data } = await supabase
+    .from("profesionales")
+    .select("id")
+    .eq("auth_id", authId)
+    .maybeSingle();
+  return (data?.id as string) ?? null;
+}
+
 // ── Helper: audit log ──────────────────────────────────────────────────────
 
 async function logAudit(
