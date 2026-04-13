@@ -40,7 +40,7 @@ async function getOrCreateEncounter(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   patientId: string,
-  userId: string,
+  profesionalId: string,
   idClinica: string | null,
   especialidad: string,
 ): Promise<string> {
@@ -78,7 +78,7 @@ async function getOrCreateEncounter(
     .from("fce_encuentros")
     .insert({
       id_paciente: patientId,
-      id_profesional: userId,
+      id_profesional: profesionalId,
       especialidad,
       modalidad: "presencial",
       status: "en_progreso",
@@ -130,7 +130,6 @@ export async function upsertSoapNote(
     .eq("auth_id", user.id)
     .maybeSingle();
   const especialidad = (prof?.especialidad as string) ?? "kinesiologia";
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const profesionalId = prof?.id ?? null;
 
   let id: string;
@@ -160,7 +159,10 @@ export async function upsertSoapNote(
     const idClinica = await getIdClinica(supabase, user.id);
     let encounterId: string;
     try {
-      encounterId = await getOrCreateEncounter(supabase, patientId, user.id, idClinica, especialidad);
+      if (!profesionalId) {
+        return { success: false, error: "No se encontró el profesional asociado al usuario." };
+      }
+      encounterId = await getOrCreateEncounter(supabase, patientId, profesionalId, idClinica, especialidad);
     } catch (e) {
       return { success: false, error: (e as Error).message };
     }
@@ -193,8 +195,14 @@ export async function signSoapNote(
 ): Promise<ActionResult<void>> {
   const { supabase, user } = await requireAuth();
 
-  // firmado_por almacena el UUID del profesional (FK)
-  const firmadoPor = user.id;
+  // firmado_por almacena profesionales.id (no auth.uid) — FK a profesionales
+  const { data: profData } = await supabase
+    .from("profesionales")
+    .select("id")
+    .eq("auth_id", user.id)
+    .maybeSingle();
+  const firmadoPor = profData?.id ?? null;
+  if (!firmadoPor) return { success: false, error: "No se encontró el profesional asociado al usuario." };
 
   // Leer id_encuentro ANTES de firmar para garantizar que lo obtenemos
   const { data: notaConEncuentro } = await supabase
