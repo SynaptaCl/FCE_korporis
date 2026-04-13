@@ -2,13 +2,16 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, FileText, Plus, Lock, Clock } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { getPatientById } from "@/app/actions/patients";
+import { getPatientById, getUserContext } from "@/app/actions/patients";
 import { getSoapNotes } from "@/app/actions/soap";
 import { getEvaluaciones } from "@/app/actions/evaluacion";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { SoapForm } from "@/components/modules/SoapForm";
 import { calculateAge, formatRut } from "@/lib/utils";
+import { canWrite } from "@/lib/permissions";
+import type { UserContext } from "@/lib/permissions";
+import type { Especialidad } from "@/lib/constants";
 import type { SoapNote } from "@/types";
 
 export async function generateMetadata({
@@ -52,6 +55,11 @@ export default async function EvolucionPage({
   const supabase = await createClient();
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) redirect("/login");
+
+  const userCtx = await getUserContext(supabase, user.id);
+  const puedeEscribir = userCtx
+    ? canWrite(userCtx, (userCtx.especialidad ?? "kinesiologia") as Especialidad)
+    : false;
 
   const [patientResult, notesResult, objetivoHint] = await Promise.all([
     getPatientById(id),
@@ -137,6 +145,7 @@ export default async function EvolucionPage({
           patientId={id}
           initialNote={activeNote}
           objetivoHint={objetivoHint || undefined}
+          readOnly={!puedeEscribir}
         />
       </Card>
 
