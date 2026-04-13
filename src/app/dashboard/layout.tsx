@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { BrandingInjector, type BrandingConfig } from "@/components/layout/BrandingInjector";
 import type { Especialidad, Rol } from "@/lib/constants";
+import { canAccessFCE } from "@/lib/permissions";
+import type { UserContext } from "@/lib/permissions";
 
 export default async function DashboardLayout({
   children,
@@ -54,6 +56,18 @@ export default async function DashboardLayout({
   const apellidos = profesional?.apellidos ?? "";
   const especialidad = (profesional?.especialidad as Especialidad) ?? "kinesiologia";
   const rol          = (profesional?.rol          as Rol)          ?? "profesional";
+
+  // Bloquear recepcionistas — no tienen acceso a la FCE
+  const userCtx: UserContext = {
+    userId: user.id,
+    idClinica,
+    rol,
+    idProfesional: null,
+    especialidad: null,
+  };
+  if (!canAccessFCE(userCtx)) {
+    redirect("/login");
+  }
 
   const practitionerName = apellidos ? `${nombre} ${apellidos}` : nombre;
   const initials = [nombre[0], apellidos[0]].filter(Boolean).join("").toUpperCase() || "U";
