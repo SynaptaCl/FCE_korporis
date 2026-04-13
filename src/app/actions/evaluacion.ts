@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { ActionResult } from "./patients";
+import { getProfesionalId } from "./patients";
 import type { Evaluation } from "@/types";
 
 // ── Helper ─────────────────────────────────────────────────────────────────
@@ -57,6 +58,9 @@ export async function upsertEvaluacion(
 ): Promise<ActionResult<{ id: string }>> {
   const { supabase, user } = await requireAuth();
 
+  const profesionalId = await getProfesionalId(supabase, user.id);
+  if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
+
   const { data: existing } = await supabase
     .from("fce_evaluaciones")
     .select("id")
@@ -85,7 +89,7 @@ export async function upsertEvaluacion(
         especialidad,
         sub_area: subArea,
         data,
-        created_by: user.id,
+        created_by: profesionalId,
       })
       .select("id")
       .single();
