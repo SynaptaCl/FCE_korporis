@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { anamnesisSchema, vitalSignsSchema, type AnamnesisSchemaType, type VitalSignsSchemaType } from "@/lib/validations";
 import type { Anamnesis, VitalSigns } from "@/types";
 import type { ActionResult } from "./patients";
-import { getIdClinica } from "./patients";
+import { getIdClinica, getProfesionalId } from "./patients";
 
 // ── Helper ─────────────────────────────────────────────────────────────────
 
@@ -85,13 +85,17 @@ export async function upsertAnamnesis(
     await logAudit(supabase, user.id, "update", "anamnesis", id, patientId);
   } else {
     // INSERT
-    const idClinica = await getIdClinica(supabase, user.id);
+    const [idClinica, profesionalId] = await Promise.all([
+      getIdClinica(supabase, user.id),
+      getProfesionalId(supabase, user.id),
+    ]);
+    if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
     const { data: created, error } = await supabase
       .from("fce_anamnesis")
       .insert({
         id_paciente: patientId,
         ...parsed.data,
-        created_by: user.id,
+        created_by: profesionalId,
         ...(idClinica ? { id_clinica: idClinica } : {}),
       })
       .select("id")
@@ -138,13 +142,16 @@ export async function saveVitalSigns(
 
   const { supabase, user } = await requireAuth();
 
+  const profesionalId = await getProfesionalId(supabase, user.id);
+  if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
+
   const { data, error } = await supabase
     .from("fce_signos_vitales")
     .insert({
       id_paciente: patientId,
       id_encuentro: null, // Registro de M2 — sin encuentro activo
       ...parsed.data,
-      recorded_by: user.id,
+      recorded_by: profesionalId,
       recorded_at: new Date().toISOString(),
     })
     .select("id")
