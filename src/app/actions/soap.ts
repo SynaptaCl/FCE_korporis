@@ -44,8 +44,9 @@ async function getOrCreateEncounter(
   idClinica: string | null,
   especialidad: string,
 ): Promise<string> {
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
+  // Calcular rango del día en zona horaria de Santiago para evitar desfase UTC
+  const hoySantiago = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Santiago" });
+  const todayStart = new Date(`${hoySantiago}T00:00:00-04:00`);
   const tomorrowStart = new Date(todayStart);
   tomorrowStart.setDate(tomorrowStart.getDate() + 1);
 
@@ -63,10 +64,11 @@ async function getOrCreateEncounter(
       .maybeSingle();
 
     if (preplanned?.id) {
-      await supabase
+      const { error: updateError } = await supabase
         .from("fce_encuentros")
         .update({ status: "en_progreso", started_at: new Date().toISOString() })
         .eq("id", preplanned.id);
+      if (updateError) throw new Error(updateError.message);
       return preplanned.id as string;
     }
   }
@@ -192,6 +194,13 @@ export async function signSoapNote(
   // firmado_por almacena el UUID del profesional (FK)
   const firmadoPor = user.id;
 
+  // Leer id_encuentro ANTES de firmar para garantizar que lo obtenemos
+  const { data: notaConEncuentro } = await supabase
+    .from("fce_notas_soap")
+    .select("id_encuentro")
+    .eq("id", noteId)
+    .single();
+
   const { error } = await supabase
     .from("fce_notas_soap")
     .update({
@@ -203,13 +212,6 @@ export async function signSoapNote(
     .eq("firmado", false); // solo si no estaba ya firmado
 
   if (error) return { success: false, error: error.message };
-
-  // Cerrar el encuentro específico vinculado al SOAP note
-  const { data: notaConEncuentro } = await supabase
-    .from("fce_notas_soap")
-    .select("id_encuentro")
-    .eq("id", noteId)
-    .single();
 
   if (notaConEncuentro?.id_encuentro) {
     await supabase
