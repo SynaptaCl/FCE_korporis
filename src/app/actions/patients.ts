@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { patientSchema, type PatientSchemaType } from "@/lib/validations";
 import { formatRut } from "@/lib/run-validator";
 import type { Patient, PacienteClinico, CitaAgenda } from "@/types";
+import type { UserContext } from "@/lib/permissions";
+import type { Especialidad, Rol } from "@/lib/constants";
 
 // ── Tipos de respuesta ─────────────────────────────────────────────────────
 
@@ -47,6 +49,47 @@ export async function getProfesionalId(supabase: any, authId: string): Promise<s
     .eq("auth_id", authId)
     .maybeSingle();
   return (data?.id as string) ?? null;
+}
+
+// ── Helper: user context ───────────────────────────────────────────────────
+
+/**
+ * Resuelve el contexto completo del usuario autenticado para verificar permisos.
+ * Consulta admin_users (id_clinica, rol) y profesionales (id, especialidad, rol) en paralelo.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getUserContext(supabase: any, userId: string): Promise<UserContext | null> {
+  const [adminRes, profRes] = await Promise.all([
+    supabase
+      .from("admin_users")
+      .select("id_clinica, rol")
+      .eq("auth_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("profesionales")
+      .select("id, especialidad, rol")
+      .eq("auth_id", userId)
+      .maybeSingle(),
+  ]);
+
+  const idClinica = (adminRes.data?.id_clinica as string) ?? null;
+
+  // profesionales.rol tiene precedencia; fallback a admin_users.rol; default "profesional"
+  const rol = ((profRes.data?.rol ?? adminRes.data?.rol ?? "profesional") as Rol);
+
+  // Normalizar especialidad: DB guarda "Kinesiología", type espera "kinesiologia"
+  const rawEsp = profRes.data?.especialidad as string | undefined;
+  const especialidad = rawEsp
+    ? (rawEsp.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") as Especialidad)
+    : null;
+
+  return {
+    userId,
+    idClinica,
+    rol,
+    idProfesional: (profRes.data?.id as string) ?? null,
+    especialidad,
+  };
 }
 
 // ── Helper: audit log ──────────────────────────────────────────────────────
