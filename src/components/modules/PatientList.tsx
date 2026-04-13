@@ -29,7 +29,7 @@ function previsionVariant(tipo: "FONASA" | "Isapre" | "Particular" | null | unde
 
 function atencionesMeta(p: PacienteClinico): string {
   const ultima = p.ultima_atencion
-    ? `Última: ${format(new Date(p.ultima_atencion), "d MMM", { locale: es })}`
+    ? `Última: ${format(parseISO(p.ultima_atencion), "d MMM", { locale: es })}`
     : null;
   const proxima = p.proxima_cita_fecha
     ? `Próxima: ${format(parseISO(p.proxima_cita_fecha), "d MMM", { locale: es })}${
@@ -104,7 +104,7 @@ export function PatientList({ patients }: PatientListProps) {
           {filtered.map((patient, idx) => {
             const age = calculateAge(patient.fecha_nacimiento);
             const run = formatRut(patient.rut);
-            const fullName = [patient.apellido_paterno, patient.apellido_materno].filter(Boolean).join(" ") + (patient.nombre ? `, ${patient.nombre}` : "");
+            const fullName = [patient.nombre, patient.apellido_paterno, patient.apellido_materno].filter(Boolean).join(" ");
 
             return (
               <button
