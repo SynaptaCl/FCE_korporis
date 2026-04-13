@@ -1,13 +1,22 @@
-import { Calendar, Clock, Users, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Users } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { CLINIC_FULL_NAME } from "@/lib/constants";
+import { getAgendaDiaria } from "@/app/actions/patients";
+import { AgendaTable } from "@/components/modules/AgendaTable";
+import { AlertBanner } from "@/components/ui/AlertBanner";
 
 export const metadata = {
   title: "Dashboard",
 };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   const hoy = formatDate(new Date());
+  const agendaResult = await getAgendaDiaria();
+  const citas = agendaResult.success ? agendaResult.data : [];
+
+  const citasHoy = citas.length;
+  const proximaCita = citas.find((c) => c.estado === "confirmada");
+  const proximaHora = proximaCita ? proximaCita.hora_inicio.slice(0, 5) : "—";
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -17,26 +26,19 @@ export default function DashboardPage() {
         <p className="text-sm text-ink-3 mt-0.5 capitalize">{hoy}</p>
       </div>
 
-      {/* Banner en desarrollo */}
-      <div className="flex items-start gap-3 bg-kp-info-lt border border-kp-info/20 rounded-lg px-5 py-4">
-        <AlertCircle className="w-5 h-5 text-kp-info mt-0.5 shrink-0" />
-        <div>
-          <p className="text-sm font-semibold text-kp-info">
-            Módulo en desarrollo
-          </p>
-          <p className="text-sm text-ink-2 mt-0.5">
-            La agenda diaria se implementará en una fase posterior. Por ahora
-            accede al módulo de pacientes desde el menú lateral.
-          </p>
-        </div>
-      </div>
+      {/* Error cargando agenda */}
+      {!agendaResult.success && (
+        <AlertBanner variant="danger" title="Error al cargar la agenda">
+          {agendaResult.error}
+        </AlertBanner>
+      )}
 
-      {/* Cards resumen — placeholders */}
+      {/* Cards resumen */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <SummaryCard
           icon={<Calendar className="w-5 h-5 text-kp-accent" />}
           label="Citas hoy"
-          value="—"
+          value={String(citasHoy)}
           bg="bg-kp-accent-xs"
         />
         <SummaryCard
@@ -48,10 +50,13 @@ export default function DashboardPage() {
         <SummaryCard
           icon={<Clock className="w-5 h-5 text-ink-3" />}
           label="Próxima cita"
-          value="—"
+          value={proximaHora}
           bg="bg-surface-0"
         />
       </div>
+
+      {/* Agenda */}
+      <AgendaTable citas={citas} />
 
       <p className="text-xs text-ink-3">
         {CLINIC_FULL_NAME} · Ficha Clínica Electrónica
