@@ -7,6 +7,33 @@ import type { ActionResult } from "./patients";
 import { getProfesionalId } from "./patients";
 import type { Evaluation } from "@/types";
 
+// ── Mapa normalizado → código del catálogo ──────────────────────────────────
+// Convierte cualquier variante lowercase/sin-tilde al valor exacto que
+// acepta el trigger validate_especialidad_fce (especialidades_catalogo.codigo).
+const ESPECIALIDAD_DB: Record<string, string> = {
+  kinesiologia:              "Kinesiología",
+  fonoaudiologia:            "Fonoaudiología",
+  masoterapia:               "Masoterapia",
+  "administracion clinica":  "Administración Clínica",
+  "administracion-clinica":  "Administración Clínica",
+  odontologia:               "Odontología",
+  "medicina general":        "Medicina General",
+  psicologia:                "Psicología",
+  nutricion:                 "Nutrición",
+  "terapia ocupacional":     "Terapia Ocupacional",
+  podologia:                 "Podología",
+};
+
+/**
+ * Devuelve el código exacto del catálogo de especialidades.
+ * Si ya viene con tilde/capitalizado (ej. desde profesionales.especialidad),
+ * lo devuelve tal cual. Si viene normalizado, lo mapea.
+ */
+function toEspecialidadDB(raw: string): string {
+  const normalizado = raw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return ESPECIALIDAD_DB[normalizado] ?? raw;
+}
+
 // ── Helper ─────────────────────────────────────────────────────────────────
 
 async function requireAuth() {
@@ -61,11 +88,14 @@ export async function upsertEvaluacion(
   const profesionalId = await getProfesionalId(supabase, user.id);
   if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
 
+  // Garantizar que el valor escrito en DB coincide con especialidades_catalogo.codigo
+  const especialidadDB = toEspecialidadDB(especialidad);
+
   const { data: existing } = await supabase
     .from("fce_evaluaciones")
     .select("id")
     .eq("id_paciente", patientId)
-    .eq("especialidad", especialidad)
+    .eq("especialidad", especialidadDB)
     .eq("sub_area", subArea)
     .maybeSingle();
 
@@ -86,7 +116,7 @@ export async function upsertEvaluacion(
       .insert({
         id_paciente: patientId,
         id_encuentro: null,
-        especialidad,
+        especialidad: especialidadDB,
         sub_area: subArea,
         data,
         created_by: profesionalId,

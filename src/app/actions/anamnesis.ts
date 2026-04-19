@@ -142,7 +142,10 @@ export async function saveVitalSigns(
 
   const { supabase, user } = await requireAuth();
 
-  const profesionalId = await getProfesionalId(supabase, user.id);
+  const [profesionalId, idClinica] = await Promise.all([
+    getProfesionalId(supabase, user.id),
+    getIdClinica(supabase, user.id),
+  ]);
   if (!profesionalId) return { success: false, error: "No se encontró el profesional asociado al usuario." };
 
   const { data, error } = await supabase
@@ -153,6 +156,7 @@ export async function saveVitalSigns(
       ...parsed.data,
       recorded_by: profesionalId,
       recorded_at: new Date().toISOString(),
+      ...(idClinica ? { id_clinica: idClinica } : {}),
     })
     .select("id")
     .single();
